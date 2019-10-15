@@ -50,7 +50,10 @@ int AngleToTicks(double angle) {
 }
 
 int main(void) {
-	//  TO JEST BRANCH i2c_lcd_testing
+	//  TO JEST BRANCH i2c_lcd_testing zapisany lokalnie
+	// bardzo lokalnie - trzeba pobrac z neta i sprawdzic czy zniknie
+
+	// jak dziala ten IC ktory jest doczepiony - w jaki sposob wysyla informacje do LCD
 	SysTick_Config(SystemCoreClock / 1000);
 
 	RCC_APB2PeriphClockCmd(
@@ -69,14 +72,33 @@ int main(void) {
 
 	check_i2c_LSM303D();
 	printf("Start PRORGAMU \n\r");
-	for (int i = 0; i<5; i++){
-		lcd_send_cmd(DISP_ON_CURSOR_OFF);
-//		lcd_send_data(10);
-		delay_ms(1000);
-		lcd_send_cmd(DISP_OFF_CURSOR_OFF);
-		delay_ms(1000);
-	}
-	lcd_send_cmd(DISP_ON_CURSOR_OFF);
+	uint8_t toWrite = 0;
+	//Table 12 4-Bit Operation, 8-Digit ´ 1-Line Display Example with Internal Reset
+	lcd_set_reg(0x02);
+	delay_ms(30);
+	lcd_set_reg(0x0e);
+	delay_ms(30);
+	lcd_set_reg(0x0c);
+	delay_ms(30);
+	lcd_set_reg(0x4f);
+//	while (1){
+//		lcd_set_reg(toWrite);
+//		delay_ms(300);
+//		printf("%x \n",toWrite);
+//		toWrite ++;
+//	}
+//	while(1){
+//		int input =
+//		lcd_set_reg(input);
+//	}
+//	for (int i = 0; i<5; i++){
+//		lcd_set_reg(DISP_ON_CURSOR_OFF);
+////		lcd_send_data(10);
+//		delay_ms(1000);
+//		lcd_set_reg(DISP_OFF_CURSOR_OFF);
+//		delay_ms(1000);
+//	}
+
 	printf("po wyslaniu \n\r");
 	delay_ms(200);
 	//------------------------------

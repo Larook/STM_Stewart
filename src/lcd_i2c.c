@@ -21,7 +21,7 @@ void lcd_set_reg(uint8_t reg) {
 			!= SUCCESS)
 		;
 
-	I2C_SendData(I2C1, 0x80 | reg); // dlaczego dodajemy 0x80?
+	I2C_SendData(I2C1, reg); // dlaczego dodajemy 0x80?
 	while (I2C_CheckEvent(I2C1, I2C_EVENT_MASTER_BYTE_TRANSMITTING) != SUCCESS)
 		;
 }
