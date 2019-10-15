@@ -50,7 +50,7 @@ int AngleToTicks(double angle) {
 }
 
 int main(void) {
-
+	//  TO JEST BRANCH i2c_lcd_testing
 	SysTick_Config(SystemCoreClock / 1000);
 
 	RCC_APB2PeriphClockCmd(
@@ -63,9 +63,7 @@ int main(void) {
 	init_USART2();
 	init_I2C();
 
-
 	set_default_Magnetometer();
-	//  TO JEST TEST GITOWANIA
 
 	set_default_Accelerometer();
 
