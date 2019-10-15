@@ -65,6 +65,7 @@ int main(void) {
 
 
 	set_default_Magnetometer();
+	//  TO JEST TEST GITOWANIA
 
 	set_default_Accelerometer();
 
