@@ -50,8 +50,7 @@ int AngleToTicks(double angle) {
 }
 
 int main(void) {
-	//  TO JEST BRANCH i2c_lcd_testing zapisany lokalnie
-	// bardzo lokalnie - trzeba pobrac z neta i sprawdzic czy zniknie
+	//  TO JEST BRANCH "touchscreen_now"
 
 	// jak dziala ten IC ktory jest doczepiony - w jaki sposob wysyla informacje do LCD
 	SysTick_Config(SystemCoreClock / 1000);
