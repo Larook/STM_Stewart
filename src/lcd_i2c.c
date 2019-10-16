@@ -12,7 +12,7 @@
 #include "lcd_i2c.h"
 #include <stdio.h>
 
-void lcd_set_reg(uint8_t reg) {
+void lcd_send_4bit(uint8_t data) {
 	I2C_GenerateSTART(I2C1, ENABLE);
 	while (I2C_CheckEvent(I2C1, I2C_EVENT_MASTER_MODE_SELECT) != SUCCESS)
 		;
@@ -21,10 +21,59 @@ void lcd_set_reg(uint8_t reg) {
 			!= SUCCESS)
 		;
 
-	I2C_SendData(I2C1, reg); // dlaczego dodajemy 0x80?
+	I2C_SendData(I2C1, data); // dlaczego dodajemy 0x80?
 	while (I2C_CheckEvent(I2C1, I2C_EVENT_MASTER_BYTE_TRANSMITTING) != SUCCESS)
 		;
 }
+void lcd_send_two_4bit(uint8_t data1, uint8_t data2) {
+	I2C_GenerateSTART(I2C1, ENABLE);
+	while (I2C_CheckEvent(I2C1, I2C_EVENT_MASTER_MODE_SELECT) != SUCCESS)
+		;
+	I2C_Send7bitAddress(I2C1, LCD_I2C_ADDRESS, I2C_Direction_Transmitter);
+	while (I2C_CheckEvent(I2C1, I2C_EVENT_MASTER_TRANSMITTER_MODE_SELECTED)
+			!= SUCCESS)
+		;
+	// po wyslaniu adresu
+	// wyslij IR7 i IR3 na DB7, czyli wyslij najpierw gorna czesc, potem dolna
+	// tutaj podzielone data1 = dataU
+	I2C_SendData(I2C1, data1 | E);
+	while (I2C_CheckEvent(I2C1, I2C_EVENT_MASTER_BYTE_TRANSMITTING) != SUCCESS)
+		;
+	I2C_SendData(I2C1, data2 | E);
+	while (I2C_CheckEvent(I2C1, I2C_EVENT_MASTER_BYTE_TRANSMITTING) != SUCCESS)
+		;
+	// potem sprawdz Busy flag check
+//	printf("check busy flag1 %d\n", lcd_read_reg(0)&1<<3);
+//	printf("check busy flag2 %d\n", lcd_read_reg(0)&1<<3);
+}
+//
+//int lcd_busy_flag_check() {
+//	int i;
+//	uint8_t* buffer = (uint8_t*) data;
+//
+//	I2C_GenerateSTART(I2C1, ENABLE);
+//	while (I2C_CheckEvent(I2C1, I2C_EVENT_MASTER_MODE_SELECT) != SUCCESS)
+//		;
+//
+//	I2C_AcknowledgeConfig(I2C1, ENABLE);
+//	I2C_Send7bitAddress(I2C1, LCD_I2C_ADDRESS | 1, I2C_Direction_Receiver);
+//	while (I2C_CheckEvent(I2C1, I2C_EVENT_MASTER_RECEIVER_MODE_SELECTED)
+//			!= SUCCESS)
+//		;
+//
+//	for (i = 0; i < size - 1; i++) {
+//		while (I2C_CheckEvent(I2C1, I2C_EVENT_MASTER_BYTE_RECEIVED) != SUCCESS)
+//			;
+//		buffer[i] = I2C_ReceiveData(I2C1);
+//	}
+//	I2C_AcknowledgeConfig(I2C1, DISABLE);
+//	I2C_GenerateSTOP(I2C1, ENABLE);
+//	while (I2C_CheckEvent(I2C1, I2C_EVENT_MASTER_BYTE_RECEIVED) != SUCCESS)
+//		;
+//	buffer[i] = I2C_ReceiveData(I2C1);
+//	return buffer[i];
+//
+//}
 
 void lcd_write_reg(uint8_t reg, uint8_t value) {
 	lcd_write(reg, &value, sizeof(value));
@@ -45,15 +94,15 @@ void lcd_write(uint8_t reg, const void* data, int size) {
 
 uint8_t lcd_read_reg(uint8_t reg) {
 	uint8_t value = 0;
-	lcd_read(reg, &value, sizeof(value));
+	lcd_read(&value, sizeof(value));
 	return value;
 }
 // raczej nieuzywane
-void lcd_read(uint8_t reg, void* data, int size) {
+void lcd_read(void* data, int size) {
 	int i;
 	uint8_t* buffer = (uint8_t*) data;
 
-	lcd_set_reg(reg); // !
+	//lcd_set_reg(reg); // !
 
 	I2C_GenerateSTART(I2C1, ENABLE);
 	while (I2C_CheckEvent(I2C1, I2C_EVENT_MASTER_MODE_SELECT) != SUCCESS)
@@ -87,7 +136,7 @@ void lcd_send_cmd(char cmd) {
 	data_t[1] = data_u;  //en=0, rs=0
 	data_t[2] = data_l | 0x04;  //en=1, rs=0
 	data_t[3] = data_l;  //en=0, rs=0 LCD_I2C_ADDRESS
-	lcd_write_reg(LCD_I2C_ADDRESS, cmd );
+	lcd_write_reg(LCD_I2C_ADDRESS, cmd);
 	//HAL_I2C_Master_Transmit(&hi2c1, 0x4E, (uint8_t *) data_t, 4, 100);
 }
 
@@ -101,7 +150,7 @@ void lcd_send_data(char data) {
 	data_t[1] = data_u | 0x01;  //en=0, rs=0
 	data_t[2] = data_l | 0x05;  //en=1, rs=0
 	data_t[3] = data_l | 0x01;  //en=0, rs=0
-	lcd_write_reg(LCD_I2C_ADDRESS, data );
+	lcd_write_reg(LCD_I2C_ADDRESS, data);
 	//HAL_I2C_Master_Transmit(&hi2c1, 0x4E, (uint8_t *) data_t, 4, 100);
 }
 

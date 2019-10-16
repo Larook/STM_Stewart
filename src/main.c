@@ -72,33 +72,8 @@ int main(void) {
 
 	check_i2c_LSM303D();
 	printf("Start PRORGAMU \n\r");
-	uint8_t toWrite = 0;
-	//Table 12 4-Bit Operation, 8-Digit ´ 1-Line Display Example with Internal Reset
-	lcd_set_reg(0x02);
-	delay_ms(30);
-	lcd_set_reg(0x0e);
-	delay_ms(30);
-	lcd_set_reg(0x0c);
-	delay_ms(30);
-	lcd_set_reg(0x4f);
-//	while (1){
-//		lcd_set_reg(toWrite);
-//		delay_ms(300);
-//		printf("%x \n",toWrite);
-//		toWrite ++;
-//	}
-//	while(1){
-//		int input =
-//		lcd_set_reg(input);
-//	}
-//	for (int i = 0; i<5; i++){
-//		lcd_set_reg(DISP_ON_CURSOR_OFF);
-////		lcd_send_data(10);
-//		delay_ms(1000);
-//		lcd_set_reg(DISP_OFF_CURSOR_OFF);
-//		delay_ms(1000);
-//	}
-
+	lcd_send_4bit(0xff); // zapal
+	lcd_send_4bit(0x00); // zgas
 	printf("po wyslaniu \n\r");
 	delay_ms(200);
 	//------------------------------
@@ -111,15 +86,15 @@ int main(void) {
 		int PlatformX = -1 * getXJoystick(25);
 		int PlatformY = -1 * getYJoystick(25);
 		int PlatformZ = -11 - getZPotentiometer(); //getZPotentiometer();
-		moveCircle(6, 3, PlatformX, PlatformY, PlatformZ);
+//		moveCircle(6, 3, PlatformX, PlatformY, PlatformZ);
 
-//		int Roll = -1 * getRollIMU(); //cos jakby troche nietak
-//		int Pitch = -1 * getPitchIMU(); //-8 do 8
-//		int Yaw = 0; //-1 * (getYawIMU() + 17); //-5 do 5
+		int Roll = -1 * getRollIMU(); //cos jakby troche nietak
+		int Pitch = -1 * getPitchIMU(); //-8 do 8
+		int Yaw = 0; //-1 * (getYawIMU() + 17); //-5 do 5
 
-		//printf(
-		//	"X = %d   \t Y = %d   \t Z = %d   \t\t Roll = %d   \t Pitch = %d   \t Yaw = %d\n\r",
-		//PlatformX, PlatformY, PlatformZ, Roll, Pitch, Yaw);
+		printf(
+				"X = %d   \t Y = %d   \t Z = %d   \t\t Roll = %d   \t Pitch = %d   \t Yaw = %d\n\r",
+				PlatformX, PlatformY, PlatformZ, Roll, Pitch, Yaw);
 
 //		while (1) {
 //		moveCircle(6, 3,PlatformX,PlatformY PlatformZ);
@@ -178,4 +153,42 @@ void EXTI15_10_IRQHandler() {
 
 		EXTI_ClearITPendingBit(EXTI_Line10);
 	}
+}
+
+void check_lcd() {
+	//Table 12 4-Bit Operation, 8-Digit ´ 1-Line Display Example with Internal Reset
+	// zamiast H wyszly 2 linie zapalone - trzeba przesledzic gdzie wychodza sciezki z i2c na disp
+	// step 2
+	lcd_send_4bit(0x02);
+	delay_ms(40);
+	// step 3
+	lcd_send_two_4bit(0x02, 0x03);
+	delay_ms(40);
+	// step 4
+	lcd_send_two_4bit(0x00, 0x0e);
+	delay_ms(40);
+	// step 5
+	lcd_send_two_4bit(0x00, 0x07);
+	delay_ms(40);
+	// step 6 (data - H)
+	lcd_send_two_4bit(0x24, 0x28);
+	delay_ms(40);
+
+//	while (1){
+//		lcd_set_reg(toWrite);
+//		delay_ms(300);
+//		printf("%x \n",toWrite);
+//		toWrite ++;
+//	}
+//	while(1){
+//		int input =
+//		lcd_set_reg(input);
+//	}
+//	for (int i = 0; i<5; i++){
+//		lcd_set_reg(DISP_ON_CURSOR_OFF);
+////		lcd_send_data(10);
+//		delay_ms(1000);
+//		lcd_set_reg(DISP_OFF_CURSOR_OFF);
+//		delay_ms(1000);
+//	}
 }

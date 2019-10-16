@@ -11,6 +11,11 @@
 // jesli PCF8574A to salve address = 01110000
 #define LCD_I2C_ADDRESS			0x4E // bit 0=R/W , bit bit 8=start condition
 
+// PCF854 wartosci waznych bitów
+#define E 		1<<4
+#define RS		1<<5
+#define RW		1<<6
+
 // LCD COMMANDS
 #define CLEAR_DISPLAY 				0x01
 #define RETURN_HOME 				0x02
@@ -37,7 +42,8 @@
 
 
 
-void lcd_set_reg(uint8_t reg);
+void lcd_send_4bit(uint8_t data);
+void lcd_send_two_4bit(uint8_t data1,uint8_t data2);
 
 void lcd_write_reg(uint8_t reg, uint8_t value);
 void lcd_write(uint8_t reg, const void* data, int size) ;
