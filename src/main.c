@@ -51,26 +51,32 @@ int AngleToTicks(double angle) {
 
 int main(void) {
 	//  TO JEST BRANCH "touchscreen_now"
+	// Trzeba podlaczyc touchscreen i dodac piny adc, a jak trzeba to channele
 
 	// jak dziala ten IC ktory jest doczepiony - w jaki sposob wysyla informacje do LCD
+
+	//https://forbot.pl/blog/kurs-stm32-8-dma-czyli-bezposredni-dostep-do-pamieci-id8465
+
 	SysTick_Config(SystemCoreClock / 1000);
 
 	RCC_APB2PeriphClockCmd(
 			RCC_APB2Periph_GPIOA | RCC_APB2Periph_GPIOB | RCC_APB2Periph_GPIOC
 					| RCC_APB2Periph_GPIOD | RCC_APB2Periph_AFIO, ENABLE);
 
+	printf("Start PRORGAMU \n\r");
 	init_ADC_DMA();
 	init_timers_for_6servos();
 	init_ButtonInterrupt();
 	init_USART2();
 	init_I2C();
 
+	printf("Po inilizacji peryferiow \n\r");
 	set_default_Magnetometer();
 
 	set_default_Accelerometer();
 
 	check_i2c_LSM303D();
-	printf("Start PRORGAMU \n\r");
+
 	lcd_send_4bit(0xff); // zapal
 	lcd_send_4bit(0x00); // zgas
 	printf("po wyslaniu \n\r");
@@ -91,9 +97,13 @@ int main(void) {
 		int Pitch = -1 * getPitchIMU(); //-8 do 8
 		int Yaw = 0; //-1 * (getYawIMU() + 17); //-5 do 5
 
+		int X_TouchPanel = getX_touchPanel();
+		int Y_TouchPanel = getY_touchPanel();
+
 		printf(
-				"X = %d   \t Y = %d   \t Z = %d   \t\t Roll = %d   \t Pitch = %d   \t Yaw = %d\n\r",
-				PlatformX, PlatformY, PlatformZ, Roll, Pitch, Yaw);
+				"X = %d   \t Y = %d   \t Z = %d   \t Xpanel = %d   \t Ypanel = %d   \t\t Roll = %d   \t Pitch = %d   \t Yaw = %d\n\r",
+				PlatformX, PlatformY, PlatformZ, X_TouchPanel, Y_TouchPanel,
+				Roll, Pitch, Yaw);
 
 //		while (1) {
 //		moveCircle(6, 3,PlatformX,PlatformY PlatformZ);
@@ -129,6 +139,16 @@ int getYJoystick(int max) {
 int getZPotentiometer() { //normalnie daje adc od 0 do 880
 	int Vz = adc_value[2] * 0.06 - 40; // teraz od -40 do 12
 	return Vz;
+}
+
+int getX_touchPanel() {
+	int Vx = adc_value[3];
+	return Vx;
+}
+
+int getY_touchPanel() {
+	int Vy = adc_value[4];
+	return Vy;
 }
 
 //--------------------- Przerwanie od przycisku ----------------

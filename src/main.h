@@ -35,4 +35,7 @@ int getXJoystick(int max);
 int getYJoystick(int max);
 int getZPotentiometer();
 
+int getY_touchPanel();
+int getY_touchPanel();
+
 #endif /* MAIN_H_ */
