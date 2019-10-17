@@ -6,7 +6,7 @@
  */
 #include "stm32f10x.h"
 
-#define ADC_CHANNELS	5 //3 // X Y Z  panelX panelY
+#define ADC_CHANNELS	5 // // X Y Z  panelX panelY
 
 uint16_t adc_value[ADC_CHANNELS]; //tablica z wynikami adc z DMA
 

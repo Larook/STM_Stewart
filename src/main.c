@@ -142,12 +142,12 @@ int getZPotentiometer() { //normalnie daje adc od 0 do 880
 	return Vz;
 }
 
-int getX_touchPanel() {
+int getX_touchPanel() { // PC0
 	int Vx = adc_value[3];
 	return Vx;
 }
 
-int getY_touchPanel() {
+int getY_touchPanel() { // PC1
 	int Vy = adc_value[4];
 	return Vy;
 }
