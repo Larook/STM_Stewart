@@ -6,7 +6,7 @@
  */
 #include "stm32f10x.h"
 
-#define ADC_CHANNELS	3 //3 // X Y Z  panelX panelY
+#define ADC_CHANNELS	5 //3 // X Y Z  panelX panelY
 
 uint16_t adc_value[ADC_CHANNELS]; //tablica z wynikami adc z DMA
 
@@ -56,9 +56,9 @@ void init_ADC_DMA() {
 	GPIO_Init(GPIOA, &gpio);
 
 	//dodanie pinow do odczytu ADC z touchpanel
-//	gpio.GPIO_Pin = GPIO_Pin_0 | GPIO_Pin_1; // PC0, PC1 wejscia ADC1 touchPanel
-//	gpio.GPIO_Mode = GPIO_Mode_AIN;
-//	GPIO_Init(GPIOC, &gpio);
+	gpio.GPIO_Pin = GPIO_Pin_0 | GPIO_Pin_1; // PC0, PC1 wejscia ADC1 touchPanel
+	gpio.GPIO_Mode = GPIO_Mode_AIN;
+	GPIO_Init(GPIOC, &gpio);
 
 	DMA_StructInit(&dma);
 	dma.DMA_PeripheralBaseAddr = (uint32_t) &ADC1->DR;
@@ -84,9 +84,9 @@ void init_ADC_DMA() {
 	ADC_RegularChannelConfig(ADC1, ADC_Channel_1, 2, ADC_SampleTime_239Cycles5);
 	ADC_RegularChannelConfig(ADC1, ADC_Channel_4, 3, ADC_SampleTime_239Cycles5);
 
-	// touchPanel
-//	ADC_RegularChannelConfig(ADC1, ADC_Channel_0, 4, ADC_SampleTime_239Cycles5);
-//	ADC_RegularChannelConfig(ADC1, ADC_Channel_1, 5, ADC_SampleTime_239Cycles5);
+	// touchPanel - jak to dobrac??? Patrzylem na koniec z CubeMX
+	ADC_RegularChannelConfig(ADC1, ADC_Channel_10, 4, ADC_SampleTime_239Cycles5);
+	ADC_RegularChannelConfig(ADC1, ADC_Channel_11, 5, ADC_SampleTime_239Cycles5);
 
 	ADC_DMACmd(ADC1, ENABLE);
 	ADC_Cmd(ADC1, ENABLE);

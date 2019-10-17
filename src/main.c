@@ -63,22 +63,23 @@ int main(void) {
 			RCC_APB2Periph_GPIOA | RCC_APB2Periph_GPIOB | RCC_APB2Periph_GPIOC
 					| RCC_APB2Periph_GPIOD | RCC_APB2Periph_AFIO, ENABLE);
 
-	printf("Start PRORGAMU \n\r");
+
 	init_ADC_DMA();
 	init_timers_for_6servos();
 	init_ButtonInterrupt();
 	init_USART2();
 	init_I2C();
-
+	printf("Start PRORGAMU \n\r");
 	printf("Po inilizacji peryferiow \n\r");
+	printf("Ustawiam defaulty IMU \n\r");
 	set_default_Magnetometer();
 
 	set_default_Accelerometer();
 
 	check_i2c_LSM303D();
 
-	lcd_send_4bit(0xff); // zapal
-	lcd_send_4bit(0x00); // zgas
+//	lcd_send_4bit(0xff); // zapal
+//	lcd_send_4bit(0x00); // zgas
 	printf("po wyslaniu \n\r");
 	delay_ms(200);
 	//------------------------------
