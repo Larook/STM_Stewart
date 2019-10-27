@@ -58,6 +58,7 @@ void init_ADC_DMA() {
 	//dodanie pinow do odczytu ADC z touchpanel
 	gpio.GPIO_Pin = GPIO_Pin_0 | GPIO_Pin_1; // PC0, PC1 wejscia ADC1 touchPanel
 	gpio.GPIO_Mode = GPIO_Mode_AIN;
+	gpio.GPIO_Speed = GPIO_Speed_2MHz;
 	GPIO_Init(GPIOC, &gpio);
 
 	DMA_StructInit(&dma);

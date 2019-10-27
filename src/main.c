@@ -63,7 +63,6 @@ int main(void) {
 			RCC_APB2Periph_GPIOA | RCC_APB2Periph_GPIOB | RCC_APB2Periph_GPIOC
 					| RCC_APB2Periph_GPIOD | RCC_APB2Periph_AFIO, ENABLE);
 
-
 	init_ADC_DMA();
 	init_timers_for_6servos();
 	init_ButtonInterrupt();
@@ -98,11 +97,13 @@ int main(void) {
 		int Pitch = -1 * getPitchIMU(); //-8 do 8
 		int Yaw = 0; //-1 * (getYawIMU() + 17); //-5 do 5
 
+//		delay_ms(4);
 		int X_TouchPanel = getX_touchPanel();
-		int Y_TouchPanel = getY_touchPanel();
+//		delay_ms(4);
+		int Y_TouchPanel = getY_touchPanel();//abs(getY_touchPanel()-4095);
 
 		printf(
-				"X = %d   \t Y = %d   \t Z = %d   \t Xpanel = %d   \t Ypanel = %d   \t\t Roll = %d   \t Pitch = %d   \t Yaw = %d\n\r",
+				"X = %d   \t Y = %d   \t Z = %d   \t Xpanel = %5d   \t Ypanel = %5d   \t\t Roll = %d   \t Pitch = %d   \t Yaw = %d\n\r",
 				PlatformX, PlatformY, PlatformZ, X_TouchPanel, Y_TouchPanel,
 				Roll, Pitch, Yaw);
 
@@ -155,6 +156,11 @@ int getY_touchPanel() { // PC1
 //--------------------- Przerwanie od przycisku ----------------
 void EXTI15_10_IRQHandler() {
 	if (EXTI_GetITStatus(EXTI_Line10)) {
+//		int X_TouchPanel = getX_touchPanel();
+//		int Y_TouchPanel = abs(getY_touchPanel() - 4095); //getY_touchPanel();//abs(getY_touchPanel()-4095);
+//
+//		printf("X_TouchPanel %d 	Y_TouchPanel %d", X_TouchPanel, Y_TouchPanel);
+
 		//wykonuj program w zaleznosci od przycisku
 		if ((GPIO_ReadInputDataBit(GPIOC, GPIO_Pin_10) == 0)
 				& (prevState % 2 == 0)) {
