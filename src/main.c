@@ -24,6 +24,8 @@ volatile uint32_t timer_ms = 0;
 
 int8_t prevState = 1; // najpierw byl wylaczony
 int8_t doRPY = 0;
+int16_t X_TouchPanel = 0;
+int16_t Y_TouchPanel = 0;
 
 void SysTick_Handler() {
 	if (timer_ms)
@@ -98,9 +100,9 @@ int main(void) {
 		int Yaw = 0; //-1 * (getYawIMU() + 17); //-5 do 5
 
 //		delay_ms(4);
-		int X_TouchPanel = getX_touchPanel();
+		X_TouchPanel = getX_touchPanel();
 //		delay_ms(4);
-		int Y_TouchPanel = getY_touchPanel();//abs(getY_touchPanel()-4095);
+		Y_TouchPanel = getY_touchPanel();//abs(getY_touchPanel()-4095);
 
 		printf(
 				"X = %d   \t Y = %d   \t Z = %d   \t Xpanel = %5d   \t Ypanel = %5d   \t\t Roll = %d   \t Pitch = %d   \t Yaw = %d\n\r",
