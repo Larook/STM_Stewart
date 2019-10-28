@@ -5,14 +5,47 @@
  *      Author: PiK
  */
 #include "stm32f10x.h"
+#include "main.h"
 
-#define ADC_CHANNELS	5 // // X Y Z  panelX panelY
+//#define ADC_CHANNELS	5 // // X Y Z  panelX panelY
 
-uint16_t adc_value[ADC_CHANNELS]; //tablica z wynikami adc z DMA
+//uint16_t adc_value[ADC_CHANNELS]; //tablica z wynikami adc z DMA
 
-//serwa:
+void init_timer_touch() {
+	RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM2, ENABLE);
+	TIM_TimeBaseInitTypeDef tim;
+	NVIC_InitTypeDef nvic;
+
+	TIM_TimeBaseStructInit(&tim);
+	tim.TIM_CounterMode = TIM_CounterMode_Up;
+	tim.TIM_Prescaler = 64000 - 1;
+	tim.TIM_Period = 1000 - 1;
+	TIM_TimeBaseInit(TIM2, &tim);
+
+	TIM_ITConfig(TIM2, TIM_IT_Update, ENABLE);
+	TIM_Cmd(TIM2, ENABLE);
+
+	nvic.NVIC_IRQChannel = TIM2_IRQn;
+	nvic.NVIC_IRQChannelPreemptionPriority = 0;
+	nvic.NVIC_IRQChannelSubPriority = 0;
+	nvic.NVIC_IRQChannelCmd = ENABLE;
+	NVIC_Init(&nvic);
+
+//	GPIO_InitTypeDef gpio3; //PC3 (T1-red) i PC2 (T2-blue)
+	GPIO_StructInit(&gpio);
+	gpio.GPIO_Pin = GPIO_Pin_2 | GPIO_Pin_3;
+	gpio.GPIO_Mode = GPIO_Mode_Out_PP;
+	GPIO_Init(GPIOC, &gpio);
+
+	GPIO_StructInit(&gpio);
+	gpio.GPIO_Pin = GPIO_Pin_5;
+	gpio.GPIO_Mode = GPIO_Mode_Out_PP;
+	GPIO_Init(GPIOA, &gpio);
+
+}
+
 void init_ADC_DMA() {
-	GPIO_InitTypeDef gpio;
+//	GPIO_InitTypeDef gpio;
 	DMA_InitTypeDef dma;
 	ADC_InitTypeDef adc;
 
@@ -86,8 +119,10 @@ void init_ADC_DMA() {
 	ADC_RegularChannelConfig(ADC1, ADC_Channel_4, 3, ADC_SampleTime_239Cycles5);
 
 	// touchPanel - jak to dobrac??? Patrzylem na koniec z CubeMX
-	ADC_RegularChannelConfig(ADC1, ADC_Channel_10, 4, ADC_SampleTime_239Cycles5);
-	ADC_RegularChannelConfig(ADC1, ADC_Channel_11, 5, ADC_SampleTime_239Cycles5);
+	ADC_RegularChannelConfig(ADC1, ADC_Channel_10, 4,
+	ADC_SampleTime_239Cycles5);
+	ADC_RegularChannelConfig(ADC1, ADC_Channel_11, 5,
+	ADC_SampleTime_239Cycles5);
 
 	ADC_DMACmd(ADC1, ENABLE);
 	ADC_Cmd(ADC1, ENABLE);
@@ -129,7 +164,7 @@ void init_ButtonInterrupt() {
 void init_USART2() {
 	RCC_APB1PeriphClockCmd(RCC_APB1Periph_USART2, ENABLE);
 
-	GPIO_InitTypeDef gpio;
+//	GPIO_InitTypeDef gpio;
 	USART_InitTypeDef uart;
 
 	GPIO_StructInit(&gpio);
@@ -151,7 +186,7 @@ void init_USART2() {
 void init_I2C() {
 	RCC_APB1PeriphClockCmd(RCC_APB1Periph_I2C1, ENABLE);
 
-	GPIO_InitTypeDef gpio;
+//	GPIO_InitTypeDef gpio;
 	I2C_InitTypeDef i2c;
 
 	gpio.GPIO_Pin = GPIO_Pin_6 | GPIO_Pin_7; // SCL, SDA
@@ -167,17 +202,17 @@ void init_I2C() {
 	I2C_Cmd(I2C1, ENABLE);
 
 	// init VCC and GND for LCD i2c
-	GPIO_InitTypeDef gpio2;
-	GPIO_StructInit(&gpio2); // PA10 VCC
-	gpio2.GPIO_Pin = GPIO_Pin_10;
-	gpio2.GPIO_Mode = GPIO_Mode_Out_PP;
-	GPIO_Init(GPIOA, &gpio2);
+	GPIO_InitTypeDef gpio;
+	GPIO_StructInit(&gpio); // PA10 VCC
+	gpio.GPIO_Pin = GPIO_Pin_10;
+	gpio.GPIO_Mode = GPIO_Mode_Out_PP;
+	GPIO_Init(GPIOA, &gpio);
 	GPIO_SetBits(GPIOA, 10); // wl zasilania LCD i2c - PA10
 
-	GPIO_StructInit(&gpio2); // PC4 GND LCD
-	gpio2.GPIO_Pin = GPIO_Pin_4;
-	gpio2.GPIO_Mode = GPIO_Mode_Out_PP;
-	GPIO_Init(GPIOC, &gpio2);
+	GPIO_StructInit(&gpio); // PC4 GND LCD
+	gpio.GPIO_Pin = GPIO_Pin_4;
+	gpio.GPIO_Mode = GPIO_Mode_Out_PP;
+	GPIO_Init(GPIOC, &gpio);
 	GPIO_ResetBits(GPIOC, 4); // masa
 
 }

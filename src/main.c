@@ -12,7 +12,7 @@
 #include <fastmath.h>
 #include <stdio.h>
 #include "stm32f10x.h"
-#include "main.h"  //
+#include "main.h"
 #include "usart2.h"  // dodanie komunikacji po usarcie
 #include "lsm303d.h"  // podlaczanie i odczytywanie akcelerometru
 #include "enable_things.h"  // wlaczenie peryferiow
@@ -52,12 +52,12 @@ int AngleToTicks(double angle) {
 }
 
 int main(void) {
-	//  TO JEST BRANCH "touchscreen_now"
-	// Trzeba podlaczyc touchscreen i dodac piny adc, a jak trzeba to channele
+	//  TO JEST BRANCH "touchscreen_again"
+	// W przerwaniu umiescic pomiar Panelu i w przyszlosci wszystkich czujnikow
 
-	// jak dziala ten IC ktory jest doczepiony - w jaki sposob wysyla informacje do LCD
-
-	//https://forbot.pl/blog/kurs-stm32-8-dma-czyli-bezposredni-dostep-do-pamieci-id8465
+	// poradnik
+//	https://blog.circuits4you.com/p/4-wire-touch-screen-coding-and-testin.html
+	// do tego pdf HOW DOES IT WORK
 
 	SysTick_Config(SystemCoreClock / 1000);
 
@@ -70,6 +70,7 @@ int main(void) {
 	init_ButtonInterrupt();
 	init_USART2();
 	init_I2C();
+	init_timer_touch();
 	printf("Start PRORGAMU \n\r");
 	printf("Po inilizacji peryferiow \n\r");
 	printf("Ustawiam defaulty IMU \n\r");
@@ -82,6 +83,7 @@ int main(void) {
 //	lcd_send_4bit(0xff); // zapal
 //	lcd_send_4bit(0x00); // zgas
 	printf("po wyslaniu \n\r");
+
 	delay_ms(200);
 	//------------------------------
 
@@ -100,9 +102,12 @@ int main(void) {
 		int Yaw = 0; //-1 * (getYawIMU() + 17); //-5 do 5
 
 //		delay_ms(4);
-		X_TouchPanel = getX_touchPanel();
+		// mo¿e zrobic przerwanie co 1ms i tam ustawiac te piny
+		// TIM3 i TIM4 jest juz wykorzystywany do serv
+
+		X_TouchPanel = getX_touchPanel(); //PA5
 //		delay_ms(4);
-		Y_TouchPanel = getY_touchPanel();//abs(getY_touchPanel()-4095);
+		Y_TouchPanel = getY_touchPanel(); //PA4 //abs(getY_touchPanel()-4095);
 
 		printf(
 				"X = %d   \t Y = %d   \t Z = %d   \t Xpanel = %5d   \t Ypanel = %5d   \t\t Roll = %d   \t Pitch = %d   \t Yaw = %d\n\r",
@@ -153,6 +158,29 @@ int getX_touchPanel() { // PC0
 int getY_touchPanel() { // PC1
 	int Vy = adc_value[4];
 	return Vy;
+}
+
+// -------------------- Przerwanie do sczytanie wsp panelu dotykowego -----------
+// Wchodzi w przerwanie ale nie wlacza pinow
+void TIM2_IRQHandler() {
+	if (TIM_GetITStatus(TIM2, TIM_IT_Update) == SET) {
+		TIM_ClearITPendingBit(TIM2, TIM_IT_Update);
+
+		GPIO_SetBits(GPIOC, GPIO_Pin_2);
+		GPIO_SetBits(GPIOC, GPIO_Pin_3);
+
+		// odczyt X
+
+		// odczyt Y
+
+		if (GPIO_ReadOutputDataBit(GPIOA, GPIO_Pin_5)) {
+			GPIO_ResetBits(GPIOA, GPIO_Pin_5);
+
+		} else {
+			GPIO_SetBits(GPIOA, GPIO_Pin_5);
+		}
+
+	}
 }
 
 //--------------------- Przerwanie od przycisku ----------------

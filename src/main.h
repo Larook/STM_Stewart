@@ -8,10 +8,15 @@
 #ifndef MAIN_H_
 #define MAIN_H_
 
-#include "lsm303d.h"
-#include "enable_things.h"
-#include "servos_platform.h"
+//#include "lsm303d.h"
+//#include "enable_things.h"
+//#include "servos_platform.h"
 //#include "kinematics.h"
+#define ADC_CHANNELS	5
+
+uint16_t adc_value[ADC_CHANNELS]; //tablica z wynikami adc z DMA
+
+GPIO_InitTypeDef gpio; // jedne globalne gpio
 
 double degToRad(double degree);
 

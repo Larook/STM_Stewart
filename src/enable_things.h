@@ -5,13 +5,13 @@
  *      Author: PiK
  */
 
+
 #ifndef ENABLE_THINGS_H_
 #define ENABLE_THINGS_H_
 
-#define ADC_CHANNELS	3
 
-uint16_t adc_value[ADC_CHANNELS]; //tablica z wynikami adc z DMA
 
+void init_timer_touch();
 void init_ADC_DMA();
 void init_timers_for_6servos();
 void init_ButtonInterrupt();
