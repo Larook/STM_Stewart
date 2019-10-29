@@ -59,6 +59,13 @@ int main(void) {
 //	https://blog.circuits4you.com/p/4-wire-touch-screen-coding-and-testin.html
 	// do tego pdf HOW DOES IT WORK
 
+	/*
+	 * ZEBY ODCZYTAC PRAWIDLOWO WSP X I Y MUSZE ZMIENIC GPIO.MODE NA PINACH CZARNYM (PC1 os X) I BIALYM (PC2 os Y)
+	 * jak zmienic gpio mode? Poprzez zmiane deklaracji struktury
+	 * Dodac w takim razie druga strukture gpio_touch i skorzystac z pinow z channela ADC2 ktory by byl zmieniany programowo?
+	 *
+	 */
+
 	SysTick_Config(SystemCoreClock / 1000);
 
 	RCC_APB2PeriphClockCmd(
@@ -105,9 +112,9 @@ int main(void) {
 		// mo¿e zrobic przerwanie co 1ms i tam ustawiac te piny
 		// TIM3 i TIM4 jest juz wykorzystywany do serv
 
-		X_TouchPanel = getX_touchPanel(); //PA5
+		X_TouchPanel = getX_touchPanel(); //PC1
 //		delay_ms(4);
-		Y_TouchPanel = getY_touchPanel(); //PA4 //abs(getY_touchPanel()-4095);
+		Y_TouchPanel = getY_touchPanel(); //PC2 //abs(getY_touchPanel()-4095);
 
 		printf(
 				"X = %d   \t Y = %d   \t Z = %d   \t Xpanel = %5d   \t Ypanel = %5d   \t\t Roll = %d   \t Pitch = %d   \t Yaw = %d\n\r",
@@ -150,12 +157,12 @@ int getZPotentiometer() { //normalnie daje adc od 0 do 880
 	return Vz;
 }
 
-int getX_touchPanel() { // PC0
+int getX_touchPanel() { // PC1
 	int Vx = adc_value[3];
 	return Vx;
 }
 
-int getY_touchPanel() { // PC1
+int getY_touchPanel() { // PC2
 	int Vy = adc_value[4];
 	return Vy;
 }

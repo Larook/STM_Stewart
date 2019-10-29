@@ -89,7 +89,7 @@ void init_ADC_DMA() {
 	GPIO_Init(GPIOA, &gpio);
 
 	//dodanie pinow do odczytu ADC z touchpanel
-	gpio.GPIO_Pin = GPIO_Pin_0 | GPIO_Pin_1; // PC0, PC1 wejscia ADC1 touchPanel
+	gpio.GPIO_Pin = GPIO_Pin_1 | GPIO_Pin_2; // PC1, PC2 wejscia ADC1 touchPanel
 	gpio.GPIO_Mode = GPIO_Mode_AIN;
 	gpio.GPIO_Speed = GPIO_Speed_2MHz;
 	GPIO_Init(GPIOC, &gpio);
@@ -119,10 +119,8 @@ void init_ADC_DMA() {
 	ADC_RegularChannelConfig(ADC1, ADC_Channel_4, 3, ADC_SampleTime_239Cycles5);
 
 	// touchPanel - jak to dobrac??? Patrzylem na koniec z CubeMX
-	ADC_RegularChannelConfig(ADC1, ADC_Channel_10, 4,
-	ADC_SampleTime_239Cycles5);
-	ADC_RegularChannelConfig(ADC1, ADC_Channel_11, 5,
-	ADC_SampleTime_239Cycles5);
+	ADC_RegularChannelConfig(ADC1, ADC_Channel_11, 4,ADC_SampleTime_239Cycles5);
+	ADC_RegularChannelConfig(ADC1, ADC_Channel_12, 5,ADC_SampleTime_239Cycles5);
 
 	ADC_DMACmd(ADC1, ENABLE);
 	ADC_Cmd(ADC1, ENABLE);
