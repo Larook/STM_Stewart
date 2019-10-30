@@ -19,7 +19,7 @@ void init_timer_touch() {
 	TIM_TimeBaseStructInit(&tim);
 	tim.TIM_CounterMode = TIM_CounterMode_Up;
 	tim.TIM_Prescaler = 64000 - 1;
-	tim.TIM_Period = 1000 - 1;
+	tim.TIM_Period = 100 - 1;
 	TIM_TimeBaseInit(TIM2, &tim);
 
 	TIM_ITConfig(TIM2, TIM_IT_Update, ENABLE);
@@ -31,7 +31,7 @@ void init_timer_touch() {
 	nvic.NVIC_IRQChannelCmd = ENABLE;
 	NVIC_Init(&nvic);
 
-//	GPIO_InitTypeDef gpio3; //PC3 (T1-red) i PC2 (T2-blue)
+	GPIO_InitTypeDef gpio3; //PC3 (T0-red) i PC2 (T3-white)
 	GPIO_StructInit(&gpio);
 	gpio.GPIO_Pin = GPIO_Pin_2 | GPIO_Pin_3;
 	gpio.GPIO_Mode = GPIO_Mode_Out_PP;
@@ -89,7 +89,7 @@ void init_ADC_DMA() {
 	GPIO_Init(GPIOA, &gpio);
 
 	//dodanie pinow do odczytu ADC z touchpanel
-	gpio.GPIO_Pin = GPIO_Pin_1 | GPIO_Pin_2; // PC1, PC2 wejscia ADC1 touchPanel
+	gpio.GPIO_Pin = GPIO_Pin_1 | GPIO_Pin_0; // PC1, PC2 wejscia ADC1 touchPanel
 	gpio.GPIO_Mode = GPIO_Mode_AIN;
 	gpio.GPIO_Speed = GPIO_Speed_2MHz;
 	GPIO_Init(GPIOC, &gpio);
@@ -119,8 +119,8 @@ void init_ADC_DMA() {
 	ADC_RegularChannelConfig(ADC1, ADC_Channel_4, 3, ADC_SampleTime_239Cycles5);
 
 	// touchPanel - jak to dobrac??? Patrzylem na koniec z CubeMX
-	ADC_RegularChannelConfig(ADC1, ADC_Channel_11, 4,ADC_SampleTime_239Cycles5);
-	ADC_RegularChannelConfig(ADC1, ADC_Channel_12, 5,ADC_SampleTime_239Cycles5);
+	ADC_RegularChannelConfig(ADC1, ADC_Channel_11, 4,ADC_SampleTime_239Cycles5); //PC1
+	ADC_RegularChannelConfig(ADC1, ADC_Channel_10, 5,ADC_SampleTime_239Cycles5); //PC2-12  PC0-10
 
 	ADC_DMACmd(ADC1, ENABLE);
 	ADC_Cmd(ADC1, ENABLE);
