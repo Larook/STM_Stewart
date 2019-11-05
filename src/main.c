@@ -104,7 +104,7 @@ int main(void) {
 //		PlatformX = -1 * getXJoystick(25);
 //		PlatformY = -1 * getYJoystick(25);
 //		PlatformZ = -11 - getZPotentiometer(); //getZPotentiometer();
-		moveCircle(6, 3, env.PlatformX, env.PlatformY, env.PlatformZ);
+		moveCircle(6, 3, env.PlatformX, env.PlatformY, env);
 //
 //		Roll = -1 * getRollIMU(); //cos jakby troche nietak
 //		Pitch = -1 * getPitchIMU(); //-8 do 8

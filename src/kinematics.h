@@ -53,6 +53,6 @@ int getServXAngleOfPosY(int serwo, double pos);
 void moveServXPosY(int serwo, double pos);
 
 // trajektorie
-void moveCircle(double radius, double T_round, double tx, double ty, double tz);
+void moveCircle(double radius, double T_round, double tx, double ty, struct Environments);
 
 #endif /* KINEMATICS_H_ */

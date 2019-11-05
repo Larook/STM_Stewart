@@ -209,7 +209,7 @@ void moveServXPosY(int serwo, double pos) { //USED NAJBARDZIEJ
 }
 
 /*		funkcje ruchu		*/
-void moveCircle(double radius, double T_round, double tx, double ty, double tz) {
+void moveCircle(double radius, double T_round, double tx, double ty, struct Environments environment) {
 	printf("\nNakurwiam salto");
 	int step = 0;
 
@@ -225,13 +225,16 @@ void moveCircle(double radius, double T_round, double tx, double ty, double tz) 
 		x = radius * cos(1*phi);
 		y = radius * sin(1*phi);
 
-		//tz = -11 - getZPotentiometer();
-
 		printf("\nstep %3d | kat=%3.2f[st]  x=%.1f  y=%.1f", step, phi * 57.3,
 				x, y);
 
-		movePlatformFromTranslation_RPY(1*x+tx, 1*y+ty, -9 + 9 * sin(3*phi), 0*4 * sin(1*phi),
+		movePlatformFromTranslation_RPY(1*x+tx, 1*y+ty, environment.PlatformZ, 0*4 * sin(1*phi),
 				0*4 * cos(1*phi), 0*5* sin(phi));
+
+		/*
+		 * movePlatformFromTranslation_RPY(1*x+tx, 1*y+ty, -9 + 9 * sin(3*phi), 0*4 * sin(1*phi),
+				0*4 * cos(1*phi), 0*5* sin(phi));
+		 */
 		delay_ms(ms_t - ms_oper);
 	}
 	/*
