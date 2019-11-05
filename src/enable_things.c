@@ -12,6 +12,7 @@
 //uint16_t adc_value[ADC_CHANNELS]; //tablica z wynikami adc z DMA
 
 void init_timer_touch() {
+
 	RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM2, ENABLE);
 	TIM_TimeBaseInitTypeDef tim;
 	NVIC_InitTypeDef nvic;
@@ -19,11 +20,8 @@ void init_timer_touch() {
 	TIM_TimeBaseStructInit(&tim);
 	tim.TIM_CounterMode = TIM_CounterMode_Up;
 	tim.TIM_Prescaler = 64000 - 1;
-	tim.TIM_Period = 100 - 1;
+	tim.TIM_Period = 10 - 1;
 	TIM_TimeBaseInit(TIM2, &tim);
-
-	TIM_ITConfig(TIM2, TIM_IT_Update, ENABLE);
-	TIM_Cmd(TIM2, ENABLE);
 
 	nvic.NVIC_IRQChannel = TIM2_IRQn;
 	nvic.NVIC_IRQChannelPreemptionPriority = 0;
@@ -31,17 +29,35 @@ void init_timer_touch() {
 	nvic.NVIC_IRQChannelCmd = ENABLE;
 	NVIC_Init(&nvic);
 
-	GPIO_InitTypeDef gpio3; //PC3 (T0-red) i PC2 (T3-white)
-	GPIO_StructInit(&gpio);
-	gpio.GPIO_Pin = GPIO_Pin_2 | GPIO_Pin_3;
-	gpio.GPIO_Mode = GPIO_Mode_Out_PP;
-	GPIO_Init(GPIOC, &gpio);
-
 	GPIO_StructInit(&gpio);
 	gpio.GPIO_Pin = GPIO_Pin_5;
 	gpio.GPIO_Mode = GPIO_Mode_Out_PP;
-	GPIO_Init(GPIOA, &gpio);
+	GPIO_Init(GPIOA, &gpio); // dioda
 
+	// przygotuj do odczytania X
+	GPIO_ResetBits(GPIOA, GPIO_Pin_5);
+
+	GPIO_StructInit(&gpio);
+	gpio.GPIO_Pin = GPIO_Pin_0 | GPIO_Pin_2;
+	gpio.GPIO_Mode = GPIO_Mode_Out_PP;
+	GPIO_Init(GPIOC, &gpio);
+	GPIO_SetBits(GPIOC, GPIO_Pin_0); // blue Vcc
+	GPIO_ResetBits(GPIOC, GPIO_Pin_2); // white GND
+
+	GPIO_StructInit(&gpio);
+	gpio.GPIO_Pin = GPIO_Pin_3;
+	gpio.GPIO_Mode = GPIO_Mode_IN_FLOATING;
+	GPIO_Init(GPIOC, &gpio);  // red float
+
+	gpio.GPIO_Pin = GPIO_Pin_1;
+	gpio.GPIO_Mode = GPIO_Mode_AIN;
+	gpio.GPIO_Speed = GPIO_Speed_2MHz;
+	GPIO_Init(GPIOC, &gpio); // black read
+	//X_TouchPanel = getX_touchPanel();  // black read
+
+	//wlacz przerwania timera
+	TIM_ITConfig(TIM2, TIM_IT_Update, ENABLE);
+	TIM_Cmd(TIM2, ENABLE);
 }
 
 void init_ADC_DMA() {
@@ -119,8 +135,10 @@ void init_ADC_DMA() {
 	ADC_RegularChannelConfig(ADC1, ADC_Channel_4, 3, ADC_SampleTime_239Cycles5);
 
 	// touchPanel - jak to dobrac??? Patrzylem na koniec z CubeMX
-	ADC_RegularChannelConfig(ADC1, ADC_Channel_11, 4,ADC_SampleTime_239Cycles5); //PC1
-	ADC_RegularChannelConfig(ADC1, ADC_Channel_10, 5,ADC_SampleTime_239Cycles5); //PC2-12  PC0-10
+	ADC_RegularChannelConfig(ADC1, ADC_Channel_11, 4,
+	ADC_SampleTime_239Cycles5); //PC1
+	ADC_RegularChannelConfig(ADC1, ADC_Channel_10, 5,
+	ADC_SampleTime_239Cycles5); //PC2-12  PC0-10
 
 	ADC_DMACmd(ADC1, ENABLE);
 	ADC_Cmd(ADC1, ENABLE);
