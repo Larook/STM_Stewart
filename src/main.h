@@ -18,23 +18,41 @@ uint16_t adc_value[ADC_CHANNELS]; //tablica z wynikami adc z DMA
 
 GPIO_InitTypeDef gpio; // jedne globalne gpio
 
+struct Environments {
+
+	// joystick i potencjometr
+	int16_t PlatformX;
+	int16_t PlatformY;
+	int16_t PlatformZ;
+
+	// IMU
+	int16_t Roll;
+	int16_t Pitch;
+	int16_t Yaw;
+
+	// touchpanel
+	int16_t X_TouchPanel;
+	int16_t Y_TouchPanel;
+};
+struct Environments env; // w tym srodowisku uzupelnij zmierzone pomiary
+
 double degToRad(double degree);
 
 /*
-// ------------- Deklaracja funkcji
-double getLegLenghtforTranslationServoX(int servo, int tx, int ty, int tz);
-double getLegLenghtforTranslationServoX_RPY(int servo, int tx, int ty, int tz,
-		double Roll, double Pitch, double Yaw);
-double getAlphaFromLegLengthServoX(int servo, double LegLength);
-void movePlatformFromTranslation(int tx, int ty, int tz);
-double getHeightHomePosistion(int servo);
-double getAlphaHomePosistion(int servo);
+ // ------------- Deklaracja funkcji
+ double getLegLenghtforTranslationServoX(int servo, int tx, int ty, int tz);
+ double getLegLenghtforTranslationServoX_RPY(int servo, int tx, int ty, int tz,
+ double Roll, double Pitch, double Yaw);
+ double getAlphaFromLegLengthServoX(int servo, double LegLength);
+ void movePlatformFromTranslation(int tx, int ty, int tz);
+ double getHeightHomePosistion(int servo);
+ double getAlphaHomePosistion(int servo);
 
-int AngleToTicks(double angle);
-int getServXAngleOfPosY(int serwo, double pos);
+ int AngleToTicks(double angle);
+ int getServXAngleOfPosY(int serwo, double pos);
 
-void moveServXPosY(int serwo, double pos);
-*/
+ void moveServXPosY(int serwo, double pos);
+ */
 
 int getXJoystick(int max);
 int getYJoystick(int max);

@@ -25,17 +25,6 @@ volatile uint32_t timer_ms = 0;
 int8_t prevState = 1; // najpierw byl wylaczony
 int8_t doRPY = 0;
 
-// pobierz dane
-int PlatformX = 0;
-int PlatformY = 0;
-int PlatformZ = 0;
-
-int Roll = 0; //cos jakby troche nietak
-int Pitch = 0; //-8 do 8
-int Yaw = 0;
-
-int16_t X_TouchPanel = 0;
-int16_t Y_TouchPanel = 0;
 
 void SysTick_Handler() {
 	if (timer_ms)
@@ -115,7 +104,7 @@ int main(void) {
 //		PlatformX = -1 * getXJoystick(25);
 //		PlatformY = -1 * getYJoystick(25);
 //		PlatformZ = -11 - getZPotentiometer(); //getZPotentiometer();
-////		moveCircle(6, 3, PlatformX, PlatformY, PlatformZ);
+		moveCircle(6, 3, env.PlatformX, env.PlatformY, env.PlatformZ);
 //
 //		Roll = -1 * getRollIMU(); //cos jakby troche nietak
 //		Pitch = -1 * getPitchIMU(); //-8 do 8
@@ -189,7 +178,7 @@ void TIM2_IRQHandler() {
 			// odczytaj X i przygotuj do Y
 			GPIO_ResetBits(GPIOA, GPIO_Pin_5);
 
-			X_TouchPanel = getX_touchPanel();  // black read
+			env.X_TouchPanel = getX_touchPanel();  // black read
 
 			//reset
 			GPIO_StructInit(&gpio);
@@ -209,17 +198,17 @@ void TIM2_IRQHandler() {
 			gpio.GPIO_Speed = GPIO_Speed_2MHz;
 			GPIO_Init(GPIOC, &gpio); // blue read
 
-			PlatformX = -1 * (adc_value[0] - 2048) * 25 / 2048; // getXJoystick
-			PlatformY = -1 * (adc_value[1] - 2088) * 25 / 2048; // getYJoystick
-			PlatformZ = -11 - (adc_value[2] * 0.06 - 40); // getZPotentiometer
+			env.PlatformX = -1 * (adc_value[0] - 2048) * 25 / 2048; // getXJoystick
+			env.PlatformY = -1 * (adc_value[1] - 2088) * 25 / 2048; // getYJoystick
+			env.PlatformZ = -11 - (adc_value[2] * 0.06 - 40); // getZPotentiometer
 
-			Roll = -1 * getRollIMU(); //cos jakby troche nietak
-			Pitch = -1 * getPitchIMU(); //-8 do 8
-			Yaw = 0; //-1 * (getYawIMU() + 17); //-5 do 5
+			env.Roll = -1 * getRollIMU(); //cos jakby troche nietak
+			env.Pitch = -1 * getPitchIMU(); //-8 do 8
+			env.Yaw = 0; //-1 * (getYawIMU() + 17); //-5 do 5
 
 		} else {
 			// odczyt Y i przygotuj do X
-			Y_TouchPanel = getY_touchPanel();  // blue read
+			env.Y_TouchPanel = getY_touchPanel();  // blue read
 
 			GPIO_SetBits(GPIOA, GPIO_Pin_5);
 
@@ -244,8 +233,8 @@ void TIM2_IRQHandler() {
 			// wyswietl pomiary
 			printf(
 					"X = %d   \t Y = %d   \t Z = %d   \t Xpanel = %5d   \t Ypanel = %5d   \t\t Roll = %d   \t Pitch = %d   \t Yaw = %d\n\r",
-					PlatformX, PlatformY, PlatformZ, X_TouchPanel, Y_TouchPanel,
-					Roll, Pitch, Yaw);
+					env.PlatformX, env.PlatformY, env.PlatformZ, env.X_TouchPanel, env.Y_TouchPanel,
+					env.Roll, env.Pitch, env.Yaw);
 
 		}
 	}
