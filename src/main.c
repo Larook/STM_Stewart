@@ -25,7 +25,6 @@ volatile uint32_t timer_ms = 0;
 int8_t prevState = 1; // najpierw byl wylaczony
 int8_t doRPY = 0;
 
-
 void SysTick_Handler() {
 	if (timer_ms)
 		timer_ms--;
@@ -100,45 +99,8 @@ int main(void) {
 		/* ogarnac funkcje ktora zwieksza pos o jakas wartosc w gore lub w dol	*/
 		// mozna sprobowac na rejestrach zmieniac piny, zeby bylo szybciej
 
-		// pobierz dane
-//		PlatformX = -1 * getXJoystick(25);
-//		PlatformY = -1 * getYJoystick(25);
-//		PlatformZ = -11 - getZPotentiometer(); //getZPotentiometer();
-		moveCircle(6, 3, env);
-//
-//		Roll = -1 * getRollIMU(); //cos jakby troche nietak
-//		Pitch = -1 * getPitchIMU(); //-8 do 8
-//		Yaw = 0; //-1 * (getYawIMU() + 17); //-5 do 5
-//
-////		delay_ms(4);
-//		// mo¿e zrobic przerwanie co 1ms i tam ustawiac te piny
-//		// TIM3 i TIM4 jest juz wykorzystywany do serv
-//
-////		X_TouchPanel = getX_touchPanel(); //PC1
-////		delay_ms(4);
-////		Y_TouchPanel = getY_touchPanel(); //PC2 //abs(getY_touchPanel()-4095);
-//
-//		printf(
-//				"X = %d   \t Y = %d   \t Z = %d   \t Xpanel = %5d   \t Ypanel = %5d   \t\t Roll = %d   \t Pitch = %d   \t Yaw = %d\n\r",
-//				PlatformX, PlatformY, PlatformZ, X_TouchPanel, Y_TouchPanel,
-//				Roll, Pitch, Yaw);
-//		while (1) {
-//		moveCircle(6, 3,PlatformX,PlatformY PlatformZ);
-//
-//	}
-		/*
-		 // bez RPY
-		 if (doRPY == 0) {
-		 movePlatformFromTranslation(PlatformX, PlatformY, PlatformZ);
-		 // z RPY
-		 } else {
-		 // bylo Roll * 12.0 / 90.0, Pitch * 12.0 / 90.0, Yaw * 20.0 / 90.0);
-		 movePlatformFromTranslation_RPY(PlatformX, PlatformY, PlatformZ,
-		 Roll * 70.0 / 90.0, Pitch * 70.0 / 90.0, Yaw=0);
-		 } //
-		 */
-
-		delay_ms(7);
+		moveCircle(6, 3, env); // nowe
+//		delay_ms(7);
 	}
 
 }
@@ -232,9 +194,10 @@ void TIM2_IRQHandler() {
 
 			// wyswietl pomiary
 			printf(
-					"X = %d   \t Y = %d   \t Z = %d   \t Xpanel = %5d   \t Ypanel = %5d   \t\t Roll = %d   \t Pitch = %d   \t Yaw = %d\n\r",
-					env.PlatformX, env.PlatformY, env.PlatformZ, env.X_TouchPanel, env.Y_TouchPanel,
-					env.Roll, env.Pitch, env.Yaw);
+					"\nX = %d   \t Y = %d   \t Z = %d   \t Xpanel = %5d   \t Ypanel = %5d   \t\t Roll = %d   \t Pitch = %d   \t Yaw = %d\n\r",
+					env.PlatformX, env.PlatformY, env.PlatformZ,
+					env.X_TouchPanel, env.Y_TouchPanel, env.Roll, env.Pitch,
+					env.Yaw);
 
 		}
 	}

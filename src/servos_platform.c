@@ -5,12 +5,9 @@
  *      Author: PiK
  */
 #include "stm32f10x.h"
+#include "main.h"
 
 void init_timers_for_6servos() {
-	GPIO_InitTypeDef gpio;
-	TIM_TimeBaseInitTypeDef tim;
-	TIM_OCInitTypeDef channel;
-	NVIC_InitTypeDef nvic;
 
 	RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM3 | RCC_APB1Periph_TIM4, ENABLE);
 

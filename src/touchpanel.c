@@ -35,13 +35,13 @@ struct sTouchPanel {
 } touchPanel;
 //*p_touchPanel = &touchPanel; // zmienna wskaznikowa *p trzyma adres obiektu struktury
 
-void set_calibration_matrix_5_points(struct sTouchPanel *panelCalibration, 5pointsList,) { // podajemy obiekt, a bierze go jako wskaznik
-	panelCalibration->alpha_x = 0; // jesli zmienna wskaznikowa zawiera adres zmiennej strukturalnej, to wyluskanie ->
-	panelCalibration->beta_x = 0;
-	panelCalibration->delta_x = 0;
-
-	panelCalibration->alpha_y = 0;
-	panelCalibration->beta_y = 0;
-	panelCalibration->delta_y = 0;
-	;
-}
+//void set_calibration_matrix_5_points(struct sTouchPanel *panelCalibration, 5pointsList,) { // podajemy obiekt, a bierze go jako wskaznik
+//	panelCalibration->alpha_x = 0; // jesli zmienna wskaznikowa zawiera adres zmiennej strukturalnej, to wyluskanie ->
+//	panelCalibration->beta_x = 0;
+//	panelCalibration->delta_x = 0;
+//
+//	panelCalibration->alpha_y = 0;
+//	panelCalibration->beta_y = 0;
+//	panelCalibration->delta_y = 0;
+//	;
+//}

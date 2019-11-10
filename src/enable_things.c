@@ -14,13 +14,13 @@
 void init_timer_touch() {
 
 	RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM2, ENABLE);
-	TIM_TimeBaseInitTypeDef tim;
-	NVIC_InitTypeDef nvic;
+//	TIM_TimeBaseInitTypeDef tim_read;
+//	NVIC_InitTypeDef nvic_read;
 
 	TIM_TimeBaseStructInit(&tim);
 	tim.TIM_CounterMode = TIM_CounterMode_Up;
 	tim.TIM_Prescaler = 64000 - 1;
-	tim.TIM_Period = 10 - 1;
+	tim.TIM_Period = 100 - 1; // bylo na 10 i smigalo jak nie bylo ruchu
 	TIM_TimeBaseInit(TIM2, &tim);
 
 	nvic.NVIC_IRQChannel = TIM2_IRQn;
@@ -34,6 +34,7 @@ void init_timer_touch() {
 	gpio.GPIO_Mode = GPIO_Mode_Out_PP;
 	GPIO_Init(GPIOA, &gpio); // dioda
 
+	// Przygotuj piny do oblsugi odczytywanie wspolrzednych panelu dotykowego w przerwaniu
 	// przygotuj do odczytania X
 	GPIO_ResetBits(GPIOA, GPIO_Pin_5);
 

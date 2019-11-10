@@ -19,6 +19,13 @@
 uint16_t adc_value[ADC_CHANNELS]; //tablica z wynikami adc z DMA
 
 GPIO_InitTypeDef gpio; // jedne globalne gpio
+TIM_TimeBaseInitTypeDef tim_read;
+NVIC_InitTypeDef nvic_read;
+
+TIM_TimeBaseInitTypeDef tim;
+TIM_OCInitTypeDef channel;
+NVIC_InitTypeDef nvic;
+
 
 struct sEnvironment {
 
@@ -35,7 +42,7 @@ struct sEnvironment {
 	// touchpanel
 	int16_t X_TouchPanel;
 	int16_t Y_TouchPanel;
-}env ;
+} env;
 //struct Environments env; // w tym srodowisku uzupelnij zmierzone pomiary
 
 double degToRad(double degree);
