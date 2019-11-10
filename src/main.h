@@ -8,6 +8,8 @@
 #ifndef MAIN_H_
 #define MAIN_H_
 
+#include "stm32f10x.h"
+
 //#include "lsm303d.h"
 //#include "enable_things.h"
 //#include "servos_platform.h"
@@ -18,7 +20,7 @@ uint16_t adc_value[ADC_CHANNELS]; //tablica z wynikami adc z DMA
 
 GPIO_InitTypeDef gpio; // jedne globalne gpio
 
-struct Environments {
+struct sEnvironment {
 
 	// joystick i potencjometr
 	int16_t PlatformX;
@@ -33,8 +35,8 @@ struct Environments {
 	// touchpanel
 	int16_t X_TouchPanel;
 	int16_t Y_TouchPanel;
-};
-struct Environments env; // w tym srodowisku uzupelnij zmierzone pomiary
+}env ;
+//struct Environments env; // w tym srodowisku uzupelnij zmierzone pomiary
 
 double degToRad(double degree);
 

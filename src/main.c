@@ -8,7 +8,6 @@
 
  */
 
-//#include <math.h>
 #include <fastmath.h>
 #include <stdio.h>
 #include "stm32f10x.h"
@@ -19,6 +18,7 @@
 #include "servos_platform.h"  // sterowanie serwami
 #include "kinematics.h"  // stale mechaniczne budowy platformy i obliczanie katow serw dla zadanych polozen
 #include "lcd_i2c.h"
+#include "touchpanel.h"
 
 volatile uint32_t timer_ms = 0;
 
@@ -55,7 +55,7 @@ int main(void) {
 	// W przerwaniu umiescic pomiar Panelu i w przyszlosci wszystkich czujnikow
 
 	// poradnik
-//	https://blog.circuits4you.com/p/4-wire-touch-screen-coding-and-testin.html
+	// https://blog.circuits4you.com/p/4-wire-touch-screen-coding-and-testin.html
 	// do tego pdf HOW DOES IT WORK
 
 	/*
@@ -104,7 +104,7 @@ int main(void) {
 //		PlatformX = -1 * getXJoystick(25);
 //		PlatformY = -1 * getYJoystick(25);
 //		PlatformZ = -11 - getZPotentiometer(); //getZPotentiometer();
-		moveCircle(6, 3, env.PlatformX, env.PlatformY, env);
+		moveCircle(6, 3, env);
 //
 //		Roll = -1 * getRollIMU(); //cos jakby troche nietak
 //		Pitch = -1 * getPitchIMU(); //-8 do 8

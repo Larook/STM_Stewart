@@ -8,9 +8,6 @@
 #ifndef KINEMATICS_H_
 #define KINEMATICS_H_
 
-#include "stm32f10x.h"
-#include <fastmath.h>
-#include <stdio.h>
 #include "main.h"
 
 /*        STALE MECHANICZNE PLATFORMY      */
@@ -53,6 +50,6 @@ int getServXAngleOfPosY(int serwo, double pos);
 void moveServXPosY(int serwo, double pos);
 
 // trajektorie
-void moveCircle(double radius, double T_round, double tx, double ty, struct Environments);
+void moveCircle(double radius, double T_round, struct sEnvironment);
 
 #endif /* KINEMATICS_H_ */

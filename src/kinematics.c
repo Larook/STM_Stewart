@@ -6,6 +6,10 @@
  */
 #include <fastmath.h>
 #include "kinematics.h"
+#include "stm32f10x.h"
+#include <fastmath.h>
+#include <stdio.h>
+#include "main.h"
 
 /*			Zmienne 					*/
 //kπt beta ustawienia serwa na p≥aszczyünie XY
@@ -209,7 +213,7 @@ void moveServXPosY(int serwo, double pos) { //USED NAJBARDZIEJ
 }
 
 /*		funkcje ruchu		*/
-void moveCircle(double radius, double T_round, double tx, double ty, struct Environments environment) {
+void moveCircle(double radius, double T_round, struct sEnvironment environment) {
 	printf("\nNakurwiam salto");
 	int step = 0;
 
@@ -225,10 +229,10 @@ void moveCircle(double radius, double T_round, double tx, double ty, struct Envi
 		x = radius * cos(1*phi);
 		y = radius * sin(1*phi);
 
-		printf("\nstep %3d | kat=%3.2f[st]  x=%.1f  y=%.1f", step, phi * 57.3,
-				x, y);
+//		printf("\nstep %3d | kat=%3.2f[st]  x=%.1f  y=%.1f", step, phi * 57.3,
+//				x, y);
 
-		movePlatformFromTranslation_RPY(1*x+tx, 1*y+ty, environment.PlatformZ, 0*4 * sin(1*phi),
+		movePlatformFromTranslation_RPY(1*x+environment.PlatformX, 1*y+environment.PlatformY, environment.PlatformZ, 0*4 * sin(1*phi),
 				0*4 * cos(1*phi), 0*5* sin(phi));
 
 		/*
