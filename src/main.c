@@ -76,9 +76,15 @@ int main(void) {
 	init_ButtonInterrupt();
 	init_USART2();
 	init_I2C();
-	init_timer_touch();
 
 	printf("Start PRORGAMU \n\r");
+	printf(
+			"Kalibracja panelu dotykowego na podstawie zmierzonych wczesniej wspolrzednych");
+	delay_ms(100);
+	/* POPRAWIC KOD */
+	init_touchPointsCalibration(&touchPanel); // kalibruje panel i wyswietla jego parametry
+	delay_ms(100);
+
 	printf("Po inilizacji peryferiow \n\r");
 	printf("Ustawiam defaulty IMU \n\r");
 	set_default_Magnetometer();
@@ -86,6 +92,7 @@ int main(void) {
 	set_default_Accelerometer();
 
 	check_i2c_LSM303D();
+	init_timer_touch(); // wlaczenie przerwan do sczytywania danych z sensorow
 
 //	lcd_send_4bit(0xff); // zapal
 //	lcd_send_4bit(0x00); // zgas
@@ -98,7 +105,6 @@ int main(void) {
 		/*dodac potencjometry ktore by sterowaly wysokoscia platformy */
 		/* ogarnac funkcje ktora zwieksza pos o jakas wartosc w gore lub w dol	*/
 		// mozna sprobowac na rejestrach zmieniac piny, zeby bylo szybciej
-
 		moveCircle(6, 3, env); // nowe
 //		delay_ms(7);
 	}

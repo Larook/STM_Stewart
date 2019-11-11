@@ -11,6 +11,7 @@
  * www.ti.com/lit/an/slyt277/slyt277.pdf
  *
  */
+#include "main.h"
 
 #ifndef TOUCHPANEL_H_
 #define TOUCHPANEL_H_
@@ -29,13 +30,20 @@
  * 					|TP0_____TP3|
  *
  * 	Przypisanie wspolrzednych TP_adc do wsp rzeczywistych
- * 	TP0 (622,401)
- * 	TP1 (647,3670)
- * 	TP2 (3498, 3686)
- * 	TP3 (3512,375)
- * 	TP4 (2040, 2006)
+ * 	TP0 (622,401)		->Rzeczywiste	->		RP0 (-71, -50)
+ * 	TP1 (647,3670)		->Rzeczywiste	->		RP1 (71, -50)
+ * 	TP2 (3498, 3686)	->Rzeczywiste	->		RP2 (71, 50)
+ * 	TP3 (3512,375)		->Rzeczywiste	->		RP3 (-71, 50)
+ * 	TP4 (2040, 2006)	->Rzeczywiste	->		RP4 (0,0)
  *
  * 	Potem trzeba dac rzeczywiste wsp tym punktom (kalibracja)
  */
+getTouchPoint(struct sPoint *struct_pointer, float tx, float ty, float rx,
+		float ry);
+setPointsArray(struct sPoint *arrayOfPoints[4]);
+set_calibration_matrix_5_points(struct sTouchPanel *panel_pointer,
+		struct sPoint *points_pointer[4]);
+init_touchPointsCalibration(struct sTouchPanel *panel_pointer);
+getRealTouch(struct sPoint *point, struct sTouchPanel *panel_pointer);
 
 #endif /* TOUCHPANEL_H_ */

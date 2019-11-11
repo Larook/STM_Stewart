@@ -26,6 +26,16 @@ TIM_TimeBaseInitTypeDef tim;
 TIM_OCInitTypeDef channel;
 NVIC_InitTypeDef nvic;
 
+struct sTouchPanel {
+	// zmienne potrzebne do kalibracji panelu dotykowego
+	float alpha_x;
+	float beta_x;
+	float delta_x;
+
+	float alpha_y;
+	float beta_y;
+	float delta_y;
+} touchPanel;
 
 struct sEnvironment {
 
