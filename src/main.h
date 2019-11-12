@@ -52,7 +52,12 @@ struct sEnvironment {
 	// touchpanel
 	int16_t X_TouchPanel;
 	int16_t Y_TouchPanel;
+
+	float X_Real;
+	float Y_Real;
 } env;
+
+
 //struct Environments env; // w tym srodowisku uzupelnij zmierzone pomiary
 
 double degToRad(double degree);

@@ -38,12 +38,12 @@
  *
  * 	Potem trzeba dac rzeczywiste wsp tym punktom (kalibracja)
  */
-getTouchPoint(struct sPoint *struct_pointer, float tx, float ty, float rx,
+setTouchPoint(struct sPoint *struct_pointer, float tx, float ty, float rx,
 		float ry);
 setPointsArray(struct sPoint *arrayOfPoints[4]);
 set_calibration_matrix_5_points(struct sTouchPanel *panel_pointer,
 		struct sPoint *points_pointer[4]);
 init_touchPointsCalibration(struct sTouchPanel *panel_pointer);
-getRealTouch(struct sPoint *point, struct sTouchPanel *panel_pointer);
+getRealTouch(int16_t touchX, int16_t touchY, struct sTouchPanel *panel_pointer);
 
 #endif /* TOUCHPANEL_H_ */

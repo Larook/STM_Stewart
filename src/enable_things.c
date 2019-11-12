@@ -36,7 +36,7 @@ void init_timer_touch() {
 
 	// Przygotuj piny do oblsugi odczytywanie wspolrzednych panelu dotykowego w przerwaniu
 	// przygotuj do odczytania X
-	GPIO_ResetBits(GPIOA, GPIO_Pin_5);
+	GPIO_SetBits(GPIOA, GPIO_Pin_5);
 
 	GPIO_StructInit(&gpio);
 	gpio.GPIO_Pin = GPIO_Pin_0 | GPIO_Pin_2;

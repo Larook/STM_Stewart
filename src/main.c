@@ -21,6 +21,7 @@
 #include "touchpanel.h"
 
 volatile uint32_t timer_ms = 0;
+struct sEnvironment* env_pointer = &env; // wskaznik do adresu environment
 
 int8_t prevState = 1; // najpierw byl wylaczony
 int8_t doRPY = 0;
@@ -136,7 +137,7 @@ int getY_touchPanel() { // PC0
 }
 
 // -------------------- Przerwanie do sczytanie wsp panelu dotykowego -----------
-// Wchodzi w przerwanie ale nie wlacza pinow
+
 void TIM2_IRQHandler() {
 	if (TIM_GetITStatus(TIM2, TIM_IT_Update) == SET) {
 		TIM_ClearITPendingBit(TIM2, TIM_IT_Update);
@@ -146,7 +147,8 @@ void TIM2_IRQHandler() {
 			// odczytaj X i przygotuj do Y
 			GPIO_ResetBits(GPIOA, GPIO_Pin_5);
 
-			env.X_TouchPanel = getX_touchPanel();  // black read
+//			env.X_TouchPanel = getX_touchPanel();  // black read
+			env_pointer->X_TouchPanel = getX_touchPanel();  // black read
 
 			//reset
 			GPIO_StructInit(&gpio);
@@ -166,17 +168,24 @@ void TIM2_IRQHandler() {
 			gpio.GPIO_Speed = GPIO_Speed_2MHz;
 			GPIO_Init(GPIOC, &gpio); // blue read
 
-			env.PlatformX = -1 * (adc_value[0] - 2048) * 25 / 2048; // getXJoystick
-			env.PlatformY = -1 * (adc_value[1] - 2088) * 25 / 2048; // getYJoystick
-			env.PlatformZ = -11 - (adc_value[2] * 0.06 - 40); // getZPotentiometer
+//			env.PlatformX = -1 * (adc_value[0] - 2048) * 25 / 2048; // getXJoystick
+			env_pointer->PlatformX = -1 * (adc_value[0] - 2048) * 25 / 2048; // getXJoystick
+//			env.PlatformY = -1 * (adc_value[1] - 2088) * 25 / 2048; // getYJoystick
+			env_pointer->PlatformY = -1 * (adc_value[1] - 2088) * 25 / 2048; // getYJoystick
+//			env.PlatformZ = -11 - (adc_value[2] * 0.06 - 40); // getZPotentiometer
+			env_pointer->PlatformZ = -11 - (adc_value[2] * 0.06 - 40); // getZPotentiometer
 
-			env.Roll = -1 * getRollIMU(); //cos jakby troche nietak
-			env.Pitch = -1 * getPitchIMU(); //-8 do 8
-			env.Yaw = 0; //-1 * (getYawIMU() + 17); //-5 do 5
+//			env.Roll = -1 * getRollIMU(); //cos jakby troche nietak
+			env_pointer->Roll = -1 * getRollIMU(); //cos jakby troche nietak
+//			env.Pitch = -1 * getPitchIMU(); //-8 do 8
+			env_pointer->Pitch = -1 * getPitchIMU(); //-8 do 8
+//			env.Yaw = 0; //-1 * (getYawIMU() + 17); //-5 do 5
+			env_pointer->Yaw = 0; //-1 * (getYawIMU() + 17); //-5 do 5
 
 		} else {
 			// odczyt Y i przygotuj do X
-			env.Y_TouchPanel = getY_touchPanel();  // blue read
+//			env.Y_TouchPanel = getY_touchPanel();  // blue read
+			env_pointer->Y_TouchPanel = getY_touchPanel();  // blue read
 
 			GPIO_SetBits(GPIOA, GPIO_Pin_5);
 
@@ -198,12 +207,19 @@ void TIM2_IRQHandler() {
 			gpio.GPIO_Speed = GPIO_Speed_2MHz;
 			GPIO_Init(GPIOC, &gpio); // black read
 
-			// wyswietl pomiary
+			/* TU POPRAWIC!!*/
+			// dodaj odczytane wspolrzedne jako punkt https://www.tutorialspoint.com/cprogramming/c_return_arrays_from_function.htm
+			float* touch_to_real = getRealTouch(env_pointer->X_TouchPanel,
+					env_pointer->Y_TouchPanel, &env);
+			env_pointer->X_Real = touch_to_real[0];
+			env_pointer->Y_Real = touch_to_real[1];
+
 			printf(
-					"\nX = %d   \t Y = %d   \t Z = %d   \t Xpanel = %5d   \t Ypanel = %5d   \t\t Roll = %d   \t Pitch = %d   \t Yaw = %d\n\r",
-					env.PlatformX, env.PlatformY, env.PlatformZ,
-					env.X_TouchPanel, env.Y_TouchPanel, env.Roll, env.Pitch,
-					env.Yaw);
+					"\nX = %d   \t Y = %d   \t Z = %d   \t Xpanel_r = %5.2f   \t Ypanel_r = %5.2f   \t\t Roll = %d   \t Pitch = %d   \t Yaw = %d\n\r",
+					env_pointer->PlatformX, env_pointer->PlatformY,
+					env_pointer->PlatformZ, env_pointer->X_Real,
+					env_pointer->Y_Real, env_pointer->Roll, env_pointer->Pitch,
+					env_pointer->Yaw);
 
 		}
 	}
@@ -275,196 +291,3 @@ void check_lcd() {
 //	}
 }
 
-// samo readX dziala
-// odczyt X DZIALA!!!!!
-//		GPIO_ResetBits(GPIOC, GPIO_Pin_2);  // white GND
-//
-//		GPIO_StructInit(&gpio);
-//		gpio.GPIO_Pin = GPIO_Pin_0;
-//		gpio.GPIO_Mode = GPIO_Mode_Out_PP;
-//		GPIO_Init(GPIOC, &gpio);
-//		GPIO_SetBits(GPIOC, GPIO_Pin_0); // blue Vcc
-//
-//		GPIO_StructInit(&gpio);
-//		gpio.GPIO_Pin = GPIO_Pin_3;
-//		gpio.GPIO_Mode = GPIO_Mode_IN_FLOATING;
-//		GPIO_Init(GPIOC, &gpio);  // red float
-//
-//		X_TouchPanel = getX_touchPanel();  // black read
-
-/*
- if (GPIO_ReadOutputDataBit(GPIOA, GPIO_Pin_5)) {
- //			GPIO_ResetBits(GPIOA, GPIO_Pin_5);
- panel_interrupt++;
- if (panel_interrupt == 1) { //
-
- //			 odczyt X DZIALA!!!!!
- // trzeba zamienic na rejestry - GPIOx->CRL i GPIOx->BRR
- GPIO_StructInit(&gpio);
- gpio.GPIO_Pin = GPIO_Pin_2;
- gpio.GPIO_Mode = GPIO_Mode_Out_PP;
- GPIO_Init(GPIOC, &gpio);
- GPIO_ResetBits(GPIOC, GPIO_Pin_2);  // white GND
-
- GPIO_StructInit(&gpio);
- gpio.GPIO_Pin = GPIO_Pin_0;
- gpio.GPIO_Mode = GPIO_Mode_Out_PP;
- GPIO_Init(GPIOC, &gpio);
- GPIO_SetBits(GPIOC, GPIO_Pin_0); // blue Vcc
-
- GPIO_StructInit(&gpio);
- gpio.GPIO_Pin = GPIO_Pin_3;
- gpio.GPIO_Mode = GPIO_Mode_IN_FLOATING;
- GPIO_Init(GPIOC, &gpio);  // red float
-
- gpio.GPIO_Pin = GPIO_Pin_1;
- gpio.GPIO_Mode = GPIO_Mode_AIN;
- gpio.GPIO_Speed = GPIO_Speed_2MHz;
- GPIO_Init(GPIOC, &gpio);
- //				X_TouchPanel = getX_touchPanel();  // black read
-
- //reset
- GPIO_StructInit(&gpio);
- gpio.GPIO_Pin = GPIO_Pin_1;
- gpio.GPIO_Mode = GPIO_Mode_Out_PP;
- GPIO_Init(GPIOC, &gpio);
- GPIO_ResetBits(GPIOC, GPIO_Pin_1);
-
- } else { // 2
- GPIO_ResetBits(GPIOA, GPIO_Pin_5);
- panel_interrupt++;
-
- X_TouchPanel = getX_touchPanel();  // black read
-
- //reset
- GPIO_StructInit(&gpio);
- gpio.GPIO_Pin = GPIO_Pin_1;
- gpio.GPIO_Mode = GPIO_Mode_Out_PP;
- GPIO_Init(GPIOC, &gpio);
- GPIO_ResetBits(GPIOC, GPIO_Pin_1);
- }
-
- } else {
- if (panel_interrupt == 3) {
- GPIO_SetBits(GPIOA, GPIO_Pin_5); // diode on
- panel_interrupt++;
-
- // odczyt Y
- GPIO_StructInit(&gpio);
- gpio.GPIO_Pin = GPIO_Pin_1;
- gpio.GPIO_Mode = GPIO_Mode_Out_PP;
- GPIO_Init(GPIOC, &gpio);
- GPIO_ResetBits(GPIOC, GPIO_Pin_1); // black GND
-
- GPIO_StructInit(&gpio);
- gpio.GPIO_Pin = GPIO_Pin_3;
- gpio.GPIO_Mode = GPIO_Mode_Out_PP;
- GPIO_Init(GPIOC, &gpio);
- GPIO_SetBits(GPIOC, GPIO_Pin_3); // red VCC
-
- GPIO_StructInit(&gpio);
- gpio.GPIO_Pin = GPIO_Pin_2;
- gpio.GPIO_Mode = GPIO_Mode_IN_FLOATING;
- GPIO_Init(GPIOC, &gpio); // blue float
-
- gpio.GPIO_Pin = GPIO_Pin_0;
- gpio.GPIO_Mode = GPIO_Mode_AIN;
- gpio.GPIO_Speed = GPIO_Speed_2MHz;
- GPIO_Init(GPIOC, &gpio);
- //			Y_TouchPanel = getY_touchPanel();  // blue read
- //
- //			//reset
- //			GPIO_StructInit(&gpio);
- //			gpio.GPIO_Pin = GPIO_Pin_0;
- //			gpio.GPIO_Mode = GPIO_Mode_Out_PP;
- //			GPIO_Init(GPIOC, &gpio);
- //			GPIO_ResetBits(GPIOC, GPIO_Pin_0);
-
- } else if (panel_interrupt == 4) {
- panel_interrupt = 0;
- Y_TouchPanel = getY_touchPanel();  // blue read
-
- //reset
- GPIO_StructInit(&gpio);
- gpio.GPIO_Pin = GPIO_Pin_0;
- gpio.GPIO_Mode = GPIO_Mode_Out_PP;
- GPIO_Init(GPIOC, &gpio);
- GPIO_ResetBits(GPIOC, GPIO_Pin_0);
- }
-
- } */
-
-//		//1:
-//		// przygotuj do odczytania X
-//		GPIO_ResetBits(GPIOA, GPIO_Pin_5);
-//
-//		GPIO_StructInit(&gpio);
-//		gpio.GPIO_Pin = GPIO_Pin_3;
-//		gpio.GPIO_Mode = GPIO_Mode_IN_FLOATING;
-//		GPIO_Init(GPIOC, &gpio);  // red float
-//
-//		gpio.GPIO_Pin = GPIO_Pin_1;
-//		gpio.GPIO_Mode = GPIO_Mode_AIN;
-//		gpio.GPIO_Speed = GPIO_Speed_2MHz;
-//		GPIO_Init(GPIOC, &gpio); // black read
-//		//X_TouchPanel = getX_touchPanel();  // black read
-//		//2:
-//		// odczytaj X i przygotuj do Y
-//		GPIO_ResetBits(GPIOA, GPIO_Pin_5);
-//
-//		X_TouchPanel = getX_touchPanel();  // black read
-//
-//		//reset
-//		GPIO_StructInit(&gpio);
-//		gpio.GPIO_Pin = GPIO_Pin_1 | GPIO_Pin_3;
-//		gpio.GPIO_Mode = GPIO_Mode_Out_PP;
-//		GPIO_Init(GPIOC, &gpio);
-//		GPIO_ResetBits(GPIOC, GPIO_Pin_1); // black GND
-//		GPIO_SetBits(GPIOC, GPIO_Pin_3); // red Vcc
-//
-//		GPIO_StructInit(&gpio);
-//		gpio.GPIO_Pin = GPIO_Pin_2;
-//		gpio.GPIO_Mode = GPIO_Mode_IN_FLOATING;
-//		GPIO_Init(GPIOC, &gpio); // white float
-//
-//		gpio.GPIO_Pin = GPIO_Pin_0;
-//		gpio.GPIO_Mode = GPIO_Mode_AIN;
-//		gpio.GPIO_Speed = GPIO_Speed_2MHz;
-//		GPIO_Init(GPIOC, &gpio); // blue read
-//		//3:
-//		// odczyt Y i przygotuj do X
-//		Y_TouchPanel = getY_touchPanel();  // blue read
-//
-//		GPIO_SetBits(GPIOA, GPIO_Pin_5);
-//
-//		//reset
-//		GPIO_StructInit(&gpio);
-//		gpio.GPIO_Pin = GPIO_Pin_0 | GPIO_Pin_2;
-//		gpio.GPIO_Mode = GPIO_Mode_Out_PP;
-//		GPIO_Init(GPIOC, &gpio);
-//		GPIO_SetBits(GPIOC, GPIO_Pin_0); // blue Vcc
-//		GPIO_ResetBits(GPIOC, GPIO_Pin_2); // white GND
-//
-//		GPIO_StructInit(&gpio);
-//		gpio.GPIO_Pin = GPIO_Pin_3;
-//		gpio.GPIO_Mode = GPIO_Mode_IN_FLOATING;
-//		GPIO_Init(GPIOC, &gpio);  // red float
-//
-//		gpio.GPIO_Pin = GPIO_Pin_1;
-//		gpio.GPIO_Mode = GPIO_Mode_AIN;
-//		gpio.GPIO_Speed = GPIO_Speed_2MHz;
-//		GPIO_Init(GPIOC, &gpio); // black read
-//		if (panel_interrupt == 0) {
-//			// przygotuj do odczytania X
-//			GPIO_ResetBits(GPIOA, GPIO_Pin_5);
-//
-//			GPIO_StructInit(&gpio);
-//			gpio.GPIO_Pin = GPIO_Pin_3;
-//			gpio.GPIO_Mode = GPIO_Mode_IN_FLOATING;
-//			GPIO_Init(GPIOC, &gpio);  // red float
-//
-//			gpio.GPIO_Pin = GPIO_Pin_1;
-//			gpio.GPIO_Mode = GPIO_Mode_AIN;
-//			gpio.GPIO_Speed = GPIO_Speed_2MHz;
-//			GPIO_Init(GPIOC, &gpio); // black read
-//			//X_TouchPanel = getX_touchPanel();  // black read
