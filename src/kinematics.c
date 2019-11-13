@@ -214,7 +214,7 @@ void moveServXPosY(int serwo, double pos) { //USED NAJBARDZIEJ
 
 /*		funkcje ruchu		*/
 void moveCircle(double radius, double T_round, struct sEnvironment environment) {
-	printf("\nNakurwiam salto");
+	printf("Nakurwiam salto\n\r");
 	int step = 0;
 
 	double phi = 0.0; // dodac ew poczatkowe przewidzenie punktu koncowego i na jego podstawie wziac startowy

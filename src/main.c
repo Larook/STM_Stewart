@@ -22,6 +22,7 @@
 
 volatile uint32_t timer_ms = 0;
 struct sEnvironment* env_pointer = &env; // wskaznik do adresu environment
+struct sTouchPanel* panel_pointer = &touchPanel;
 
 int8_t prevState = 1; // najpierw byl wylaczony
 int8_t doRPY = 0;
@@ -51,18 +52,8 @@ int AngleToTicks(double angle) {
 }
 
 int main(void) {
-	//  TO JEST BRANCH "touchscreen_again"
-	// W przerwaniu umiescic pomiar Panelu i w przyszlosci wszystkich czujnikow
-
-	// poradnik
-	// https://blog.circuits4you.com/p/4-wire-touch-screen-coding-and-testin.html
-	// do tego pdf HOW DOES IT WORK
-
 	/*
-	 * ZEBY ODCZYTAC PRAWIDLOWO WSP X I Y MUSZE ZMIENIC GPIO.MODE NA PINACH CZARNYM (PC1 os X) I BIALYM (PC2 os Y)
-	 * jak zmienic gpio mode? Poprzez zmiane deklaracji struktury
-	 * Dodac w takim razie druga strukture gpio_touch i skorzystac z pinow z channela ADC2 ktory by byl zmieniany programowo?
-	 *
+	 * ZEBY ODCZYTAC PRAWIDLOWO WSP X I Y MUSZE ZMIENIC GPIO.MODE NA PINACH
 	 * DZIALA! W PRZERWANIACH!!!
 	 */
 
@@ -82,24 +73,23 @@ int main(void) {
 	printf(
 			"Kalibracja panelu dotykowego na podstawie zmierzonych wczesniej wspolrzednych");
 	delay_ms(100);
-	/* POPRAWIC KOD */
-	init_touchPointsCalibration(&touchPanel); // kalibruje panel i wyswietla jego parametry
+
+//	init_touchPointsCalibration(&touchPanel); // kalibruje panel i wyswietla jego parametry
+	setTouchPanelCalibration(&touchPanel, 0.00, 4.32, -8765.75, 3.48, 0, -7176.76); // ale nadal korzystam ze wsp obliczonych w pythonie
 	delay_ms(100);
 
 	printf("Po inilizacji peryferiow \n\r");
 	printf("Ustawiam defaulty IMU \n\r");
 	set_default_Magnetometer();
-
 	set_default_Accelerometer();
-
 	check_i2c_LSM303D();
-	init_timer_touch(); // wlaczenie przerwan do sczytywania danych z sensorow
 
 //	lcd_send_4bit(0xff); // zapal
 //	lcd_send_4bit(0x00); // zgas
 	printf("po wyslaniu \n\r");
 
 	delay_ms(200);
+	init_timer_touch(); // wlaczenie przerwan do sczytywania danych z sensorow
 	//------------------------------
 
 	while (1) {
@@ -111,44 +101,18 @@ int main(void) {
 	}
 
 }
-//---------------------- Odczyty z przetwornikow --------------
-
-int getXJoystick(int max) {
-	int Vx = (adc_value[0] - 2048) * max / 2048; // dla polozenia normalnego zwraca 0
-	return Vx;
-}
-int getYJoystick(int max) {
-	int Vy = (adc_value[1] - 2088) * max / 2048;
-	return Vy;
-}
-int getZPotentiometer() { //normalnie daje adc od 0 do 880
-	int Vz = adc_value[2] * 0.06 - 40; // teraz od -40 do 12
-	return Vz;
-}
-
-int getX_touchPanel() { // PC1
-	int Vx = adc_value[3];
-	return Vx;
-}
-
-int getY_touchPanel() { // PC0
-	int Vy = adc_value[4];
-	return Vy;
-}
 
 // -------------------- Przerwanie do sczytanie wsp panelu dotykowego -----------
-
 void TIM2_IRQHandler() {
 	if (TIM_GetITStatus(TIM2, TIM_IT_Update) == SET) {
 		TIM_ClearITPendingBit(TIM2, TIM_IT_Update);
 
 		if (GPIO_ReadOutputDataBit(GPIOA, GPIO_Pin_5)) {
-			//2:
-			// odczytaj X i przygotuj do Y
-			GPIO_ResetBits(GPIOA, GPIO_Pin_5);
+			/* odczytaj X i przygotuj do Y */
 
-//			env.X_TouchPanel = getX_touchPanel();  // black read
-			env_pointer->X_TouchPanel = getX_touchPanel();  // black read
+			env_pointer->X_TouchPanel = adc_value[3]; // black read		getX_touchPanel()
+
+			GPIO_ResetBits(GPIOA, GPIO_Pin_5);
 
 			//reset
 			GPIO_StructInit(&gpio);
@@ -168,25 +132,18 @@ void TIM2_IRQHandler() {
 			gpio.GPIO_Speed = GPIO_Speed_2MHz;
 			GPIO_Init(GPIOC, &gpio); // blue read
 
-//			env.PlatformX = -1 * (adc_value[0] - 2048) * 25 / 2048; // getXJoystick
 			env_pointer->PlatformX = -1 * (adc_value[0] - 2048) * 25 / 2048; // getXJoystick
-//			env.PlatformY = -1 * (adc_value[1] - 2088) * 25 / 2048; // getYJoystick
 			env_pointer->PlatformY = -1 * (adc_value[1] - 2088) * 25 / 2048; // getYJoystick
-//			env.PlatformZ = -11 - (adc_value[2] * 0.06 - 40); // getZPotentiometer
 			env_pointer->PlatformZ = -11 - (adc_value[2] * 0.06 - 40); // getZPotentiometer
 
-//			env.Roll = -1 * getRollIMU(); //cos jakby troche nietak
 			env_pointer->Roll = -1 * getRollIMU(); //cos jakby troche nietak
-//			env.Pitch = -1 * getPitchIMU(); //-8 do 8
 			env_pointer->Pitch = -1 * getPitchIMU(); //-8 do 8
-//			env.Yaw = 0; //-1 * (getYawIMU() + 17); //-5 do 5
 			env_pointer->Yaw = 0; //-1 * (getYawIMU() + 17); //-5 do 5
 
 		} else {
-			// odczyt Y i przygotuj do X
-//			env.Y_TouchPanel = getY_touchPanel();  // blue read
-			env_pointer->Y_TouchPanel = getY_touchPanel();  // blue read
+			/* odczyt Y i przygotuj do X */
 
+			env_pointer->Y_TouchPanel = adc_value[4];  // blue read		getY_touchPanel()
 			GPIO_SetBits(GPIOA, GPIO_Pin_5);
 
 			//przygotuj do X
@@ -207,15 +164,20 @@ void TIM2_IRQHandler() {
 			gpio.GPIO_Speed = GPIO_Speed_2MHz;
 			GPIO_Init(GPIOC, &gpio); // black read
 
-			/* TU POPRAWIC!!*/
-			// dodaj odczytane wspolrzedne jako punkt https://www.tutorialspoint.com/cprogramming/c_return_arrays_from_function.htm
-			float* touch_to_real = getRealTouch(env_pointer->X_TouchPanel,
-					env_pointer->Y_TouchPanel, &env);
-			env_pointer->X_Real = touch_to_real[0];
-			env_pointer->Y_Real = touch_to_real[1];
+
+			// zmienna wskaznikowa pod adres funkcji
+			uint8_t* real_ptr = getPtrRealTouchArray(env_pointer->X_TouchPanel,
+					env_pointer->Y_TouchPanel, panel_pointer);
+
+			// przypisz tablice z pomiarami do sEnvironment
+			env_pointer->X_Real = -1 * real_ptr[0];
+			env_pointer->Y_Real = real_ptr[1];
+
+//			printf("Xpanel_r = %d\t\t Ypanel_r = %d\n\r", env_pointer->X_Real,
+//					env_pointer->Y_Real);
 
 			printf(
-					"\nX = %d   \t Y = %d   \t Z = %d   \t Xpanel_r = %5.2f   \t Ypanel_r = %5.2f   \t\t Roll = %d   \t Pitch = %d   \t Yaw = %d\n\r",
+					"\nX = %d   \t Y = %d   \t Z = %d   \t Xpanel_r = %d   \t Ypanel_r = %d   \t\t Roll = %d   \t Pitch = %d   \t Yaw = %d\n\r",
 					env_pointer->PlatformX, env_pointer->PlatformY,
 					env_pointer->PlatformZ, env_pointer->X_Real,
 					env_pointer->Y_Real, env_pointer->Roll, env_pointer->Pitch,
@@ -252,6 +214,31 @@ void EXTI15_10_IRQHandler() {
 		EXTI_ClearITPendingBit(EXTI_Line10);
 	}
 }
+
+//---------------------- Odczyty z przetwornikow --------------
+//int getXJoystick(int max) {
+//	int Vx = (adc_value[0] - 2048) * max / 2048; // dla polozenia normalnego zwraca 0
+//	return Vx;
+//}
+//int getYJoystick(int max) {
+//	int Vy = (adc_value[1] - 2088) * max / 2048;
+//	return Vy;
+//}
+//int getZPotentiometer() { //normalnie daje adc od 0 do 880
+//	int Vz = adc_value[2] * 0.06 - 40; // teraz od -40 do 12
+//	return Vz;
+//}
+//
+//int getX_touchPanel() { // PC1
+//	int Vx = adc_value[3];
+//	return Vx;
+//}
+//
+//int getY_touchPanel() { // PC0
+//	int Vy = adc_value[4];
+//	return Vy;
+//}
+
 
 void check_lcd() {
 	//Table 12 4-Bit Operation, 8-Digit ´ 1-Line Display Example with Internal Reset

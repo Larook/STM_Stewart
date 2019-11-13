@@ -7,20 +7,15 @@
 #include "stm32f10x.h"
 #include "main.h"
 
-//#define ADC_CHANNELS	5 // // X Y Z  panelX panelY
-
-//uint16_t adc_value[ADC_CHANNELS]; //tablica z wynikami adc z DMA
 
 void init_timer_touch() {
 
 	RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM2, ENABLE);
-//	TIM_TimeBaseInitTypeDef tim_read;
-//	NVIC_InitTypeDef nvic_read;
 
 	TIM_TimeBaseStructInit(&tim);
 	tim.TIM_CounterMode = TIM_CounterMode_Up;
 	tim.TIM_Prescaler = 64000 - 1;
-	tim.TIM_Period = 100 - 1; // bylo na 10 i smigalo jak nie bylo ruchu
+	tim.TIM_Period = 25 - 1; // bylo na 10 i smigalo jak nie bylo ruchu
 	TIM_TimeBaseInit(TIM2, &tim);
 
 	nvic.NVIC_IRQChannel = TIM2_IRQn;

@@ -63,10 +63,10 @@ void setPointsArray(struct sPoint arrayOfPoints[4]) {
 	 * 	TP3 (3512,375)		->Rzeczywiste	->		RP3 (-71, 50)
 	 * 	TP4 (2040, 2006)	->Rzeczywiste	->		RP4 (0,0)
 	 */
-	arrayOfPoints[0] = getTouchPoint(&tp0, 622, 401, -71, -50);
-	arrayOfPoints[1] = getTouchPoint(&tp1, 647, 3670, 71, -50);
-	arrayOfPoints[2] = getTouchPoint(&tp2, 3489, 3686, 71, 50);
-	arrayOfPoints[3] = getTouchPoint(&tp3, 3512, 375, -71, 50);
+	arrayOfPoints[0] = getTouchPoint(&tp0, 622, 401, -71000, -50000);
+	arrayOfPoints[1] = getTouchPoint(&tp1, 647, 3670, 71000, -50000);
+	arrayOfPoints[2] = getTouchPoint(&tp2, 3489, 3686, 71000, 50000);
+	arrayOfPoints[3] = getTouchPoint(&tp3, 3512, 375, -71000, 50000);
 	arrayOfPoints[4] = getTouchPoint(&tp4, 2040, 2006, 0, 0);
 
 //	setTouchPoint(tp0, 622, 401, -71, -50);
@@ -137,6 +137,18 @@ void set_calibration_matrix_5_points(struct sTouchPanel *panel_pointer,
 	panel_pointer->delta_y = delta_y;
 }
 
+void setTouchPanelCalibration(struct sTouchPanel *panel_pointer, float ax,
+		float bx, float dx, float ay, float by, float dy) {
+	/* wpisz parametry obliczone w pythonie */
+	panel_pointer->alpha_x = ax; // jesli zmienna wskaznikowa zawiera adres zmiennej strukturalnej, to wyluskanie ->
+	panel_pointer->beta_x = bx;
+	panel_pointer->delta_x = dx;
+
+	panel_pointer->alpha_y = ay;
+	panel_pointer->beta_y = by;
+	panel_pointer->delta_y = dy;
+}
+
 void init_touchPointsCalibration(struct sTouchPanel *panel_pointer) {
 	/* Na podstawie podanych 5 punktow oblicz macierz kalibracji */
 	struct sPoint pointsArray[5] = { tp0, tp1, tp2, tp3, tp4 }; //lokalna zmienna przechowujaca punkty kalibracyjne
@@ -149,15 +161,23 @@ void init_touchPointsCalibration(struct sTouchPanel *panel_pointer) {
 //			panel_pointer->beta_y, panel_pointer->delta_y);
 }
 
-float* getRealTouch(int16_t touchX, int16_t touchY, struct sTouchPanel *panel_pointer) {
+uint8_t* getPtrRealTouchArray(uint16_t touchX, uint16_t touchY,
+		struct sTouchPanel* panel_pointer) {
+	/* zwraca wskaznik do tablicy
+	 * https://www.geeksforgeeks.org/return-local-array-c-function/  na dole
+	 * */
+	static uint8_t data_output[2]; // tworzy statyczna tablice - stale znane miejsce w pamieci
+
 	/* Oblicza wsp rzeczywiste na podstawie macierzy kalibracji */
-	float x_real = touchX * panel_pointer->alpha_x
+	int x_real = touchX * panel_pointer->alpha_x
 			+ touchY * panel_pointer->beta_x + panel_pointer->delta_x;
-	float y_real = touchX * panel_pointer->alpha_y
+	int y_real = touchX * panel_pointer->alpha_y
 			+ touchY * panel_pointer->beta_y + panel_pointer->delta_y;
 
-	float data_output [2] = {x_real, y_real};
-	return data_output;
+	data_output[0] = x_real/100; // sprowadza do mm
+	data_output[1] = y_real/100;
+//	float data_output[] = { x_real, y_real };
+	return data_output; // zwraca tablice, ale tak naprawde jednak wskaznik
 
 }
 

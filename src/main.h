@@ -19,9 +19,6 @@
 uint16_t adc_value[ADC_CHANNELS]; //tablica z wynikami adc z DMA
 
 GPIO_InitTypeDef gpio; // jedne globalne gpio
-TIM_TimeBaseInitTypeDef tim_read;
-NVIC_InitTypeDef nvic_read;
-
 TIM_TimeBaseInitTypeDef tim;
 TIM_OCInitTypeDef channel;
 NVIC_InitTypeDef nvic;
@@ -50,11 +47,12 @@ struct sEnvironment {
 	int16_t Yaw;
 
 	// touchpanel
-	int16_t X_TouchPanel;
-	int16_t Y_TouchPanel;
+	uint16_t X_TouchPanel;
+	uint16_t Y_TouchPanel;
 
-	float X_Real;
-	float Y_Real;
+	// podane w [mm]
+	int8_t X_Real;
+	int8_t Y_Real;
 } env;
 
 
