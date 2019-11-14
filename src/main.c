@@ -55,7 +55,10 @@ int main(void) {
 	/*
 	 * ZEBY ODCZYTAC PRAWIDLOWO WSP X I Y MUSZE ZMIENIC GPIO.MODE NA PINACH
 	 * DZIALA! W PRZERWANIACH!!!
+	 * Teraz trzeba implementowac PID
+	 * a takze szukac w necie jak wykorzystac dokladnie PID do sterowania RPY
 	 */
+	int nic_nie_robi = 0;
 
 	SysTick_Config(SystemCoreClock / 1000);
 
