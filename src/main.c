@@ -19,10 +19,16 @@
 #include "kinematics.h"  // stale mechaniczne budowy platformy i obliczanie katow serw dla zadanych polozen
 #include "lcd_i2c.h"
 #include "touchpanel.h"
+#include "PID.h"
 
 volatile uint32_t timer_ms = 0;
-struct sEnvironment* env_pointer = &env; // wskaznik do adresu environment
-struct sTouchPanel* panel_pointer = &touchPanel;
+
+/* GLOBALNE WSKAZNIKI DO STRUKTUR*/
+struct sEnvironment* ptr_env = &env; // wskaznik do adresu environment
+struct sTouchPanel* ptr_touchPanel = &touchPanel;
+
+struct sPID_controller* ptr_PIDx = &PIDx;
+struct sPID_controller* ptr_PIDy = &PIDy;
 
 int8_t prevState = 1; // najpierw byl wylaczony
 int8_t doRPY = 0;
@@ -58,7 +64,6 @@ int main(void) {
 	 * Teraz trzeba implementowac PID
 	 * a takze szukac w necie jak wykorzystac dokladnie PID do sterowania RPY
 	 */
-	int nic_nie_robi = 0;
 
 	SysTick_Config(SystemCoreClock / 1000);
 
@@ -78,7 +83,8 @@ int main(void) {
 	delay_ms(100);
 
 //	init_touchPointsCalibration(&touchPanel); // kalibruje panel i wyswietla jego parametry
-	setTouchPanelCalibration(&touchPanel, 0.00, 4.32, -8765.75, 3.48, 0, -7176.76); // ale nadal korzystam ze wsp obliczonych w pythonie
+	setTouchPanelCalibration(&touchPanel, 0.00, 4.32, -8765.75, 3.48, 0,
+			-7176.76); // ale nadal korzystam ze wsp obliczonych w pythonie
 	delay_ms(100);
 
 	printf("Po inilizacji peryferiow \n\r");
@@ -92,15 +98,15 @@ int main(void) {
 	printf("po wyslaniu \n\r");
 
 	delay_ms(200);
+
+	set_PID_params(&PIDx, 100, -100, 1, 0, 0); //konstruktor do regulatora PID osi X
+	set_PID_params(&PIDy, 100, -100, 1, 0, 0); //konstruktor do regulatora PID osi Y
+
 	init_timer_touch(); // wlaczenie przerwan do sczytywania danych z sensorow
 	//------------------------------
 
 	while (1) {
-		/*dodac potencjometry ktore by sterowaly wysokoscia platformy */
-		/* ogarnac funkcje ktora zwieksza pos o jakas wartosc w gore lub w dol	*/
-		// mozna sprobowac na rejestrach zmieniac piny, zeby bylo szybciej
 		moveCircle(6, 3, env); // nowe
-//		delay_ms(7);
 	}
 
 }
@@ -113,7 +119,7 @@ void TIM2_IRQHandler() {
 		if (GPIO_ReadOutputDataBit(GPIOA, GPIO_Pin_5)) {
 			/* odczytaj X i przygotuj do Y */
 
-			env_pointer->X_TouchPanel = adc_value[3]; // black read		getX_touchPanel()
+			ptr_env->X_TouchPanel = adc_value[3]; // black read		getX_touchPanel()
 
 			GPIO_ResetBits(GPIOA, GPIO_Pin_5);
 
@@ -135,18 +141,18 @@ void TIM2_IRQHandler() {
 			gpio.GPIO_Speed = GPIO_Speed_2MHz;
 			GPIO_Init(GPIOC, &gpio); // blue read
 
-			env_pointer->PlatformX = -1 * (adc_value[0] - 2048) * 25 / 2048; // getXJoystick
-			env_pointer->PlatformY = -1 * (adc_value[1] - 2088) * 25 / 2048; // getYJoystick
-			env_pointer->PlatformZ = -11 - (adc_value[2] * 0.06 - 40); // getZPotentiometer
+			ptr_env->PlatformX = -1 * (adc_value[0] - 2048) * 25 / 2048; // getXJoystick
+			ptr_env->PlatformY = -1 * (adc_value[1] - 2088) * 25 / 2048; // getYJoystick
+			ptr_env->PlatformZ = -11 - (adc_value[2] * 0.06 - 40); // getZPotentiometer
 
-			env_pointer->Roll = -1 * getRollIMU(); //cos jakby troche nietak
-			env_pointer->Pitch = -1 * getPitchIMU(); //-8 do 8
-			env_pointer->Yaw = 0; //-1 * (getYawIMU() + 17); //-5 do 5
+			ptr_env->Roll = -1 * getRollIMU(); //cos jakby troche nietak
+			ptr_env->Pitch = -1 * getPitchIMU(); //-8 do 8
+			ptr_env->Yaw = 0; //-1 * (getYawIMU() + 17); //-5 do 5
 
 		} else {
 			/* odczyt Y i przygotuj do X */
 
-			env_pointer->Y_TouchPanel = adc_value[4];  // blue read		getY_touchPanel()
+			ptr_env->Y_TouchPanel = adc_value[4]; // blue read		getY_touchPanel()
 			GPIO_SetBits(GPIOA, GPIO_Pin_5);
 
 			//przygotuj do X
@@ -167,24 +173,22 @@ void TIM2_IRQHandler() {
 			gpio.GPIO_Speed = GPIO_Speed_2MHz;
 			GPIO_Init(GPIOC, &gpio); // black read
 
-
 			// zmienna wskaznikowa pod adres funkcji
-			uint8_t* real_ptr = getPtrRealTouchArray(env_pointer->X_TouchPanel,
-					env_pointer->Y_TouchPanel, panel_pointer);
+			uint8_t* real_ptr = getPtrRealTouchArray(ptr_env->X_TouchPanel,
+					ptr_env->Y_TouchPanel, ptr_touchPanel);
 
 			// przypisz tablice z pomiarami do sEnvironment
-			env_pointer->X_Real = -1 * real_ptr[0];
-			env_pointer->Y_Real = real_ptr[1];
+			ptr_env->X_Real = -1 * real_ptr[0];
+			ptr_env->Y_Real = real_ptr[1];
 
 //			printf("Xpanel_r = %d\t\t Ypanel_r = %d\n\r", env_pointer->X_Real,
 //					env_pointer->Y_Real);
 
 			printf(
 					"\nX = %d   \t Y = %d   \t Z = %d   \t Xpanel_r = %d   \t Ypanel_r = %d   \t\t Roll = %d   \t Pitch = %d   \t Yaw = %d\n\r",
-					env_pointer->PlatformX, env_pointer->PlatformY,
-					env_pointer->PlatformZ, env_pointer->X_Real,
-					env_pointer->Y_Real, env_pointer->Roll, env_pointer->Pitch,
-					env_pointer->Yaw);
+					ptr_env->PlatformX, ptr_env->PlatformY, ptr_env->PlatformZ,
+					ptr_env->X_Real, ptr_env->Y_Real, ptr_env->Roll,
+					ptr_env->Pitch, ptr_env->Yaw);
 
 		}
 	}
@@ -217,31 +221,6 @@ void EXTI15_10_IRQHandler() {
 		EXTI_ClearITPendingBit(EXTI_Line10);
 	}
 }
-
-//---------------------- Odczyty z przetwornikow --------------
-//int getXJoystick(int max) {
-//	int Vx = (adc_value[0] - 2048) * max / 2048; // dla polozenia normalnego zwraca 0
-//	return Vx;
-//}
-//int getYJoystick(int max) {
-//	int Vy = (adc_value[1] - 2088) * max / 2048;
-//	return Vy;
-//}
-//int getZPotentiometer() { //normalnie daje adc od 0 do 880
-//	int Vz = adc_value[2] * 0.06 - 40; // teraz od -40 do 12
-//	return Vz;
-//}
-//
-//int getX_touchPanel() { // PC1
-//	int Vx = adc_value[3];
-//	return Vx;
-//}
-//
-//int getY_touchPanel() { // PC0
-//	int Vy = adc_value[4];
-//	return Vy;
-//}
-
 
 void check_lcd() {
 	//Table 12 4-Bit Operation, 8-Digit ´ 1-Line Display Example with Internal Reset

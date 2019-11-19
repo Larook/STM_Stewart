@@ -17,6 +17,7 @@
  * i wykorzystuj ja do obliczania prawdziwej wartosci dotyku - getRealTouch
  */
 
+/* struktura w pliku zrodlowym, dlatego ze wykorzystywana jest tylko lokalnie, nie w main.c */
 struct sPoint {
 	// wspolrzedne z pomiaru ADC
 	float x_touch;
