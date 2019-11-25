@@ -23,6 +23,7 @@ float get_PID_output(sPID_controller *controller, int Ts) { // trzeba dobrac Ts 
 			|| ((y_prev < controller->limitLow) && (controller->x_in < 0))) {
 		controller->yi = controller->yi_p;
 
+
 	} else { // normalnie oblicz yi_out (calkuj)
 
 		controller->yi = controller->Ki * controller->x_in * Ts
@@ -38,11 +39,13 @@ float get_PID_output(sPID_controller *controller, int Ts) { // trzeba dobrac Ts 
 	controller->yi_p = controller->yi; // poprzednio obliczone yi
 	controller->yd_p = controller->yd;
 
+//	controller->x_in = controller->y_out; // zamkniecie petli do testow
+
 	return controller->y_out;
 }
 
-void set_PID_params(sPID_controller *controller, float limitHigh, float limitLow,
-		float Kp, float Ki, float Kd) {
+void set_PID_params(sPID_controller *controller, float limitHigh,
+		float limitLow, float Kp, float Ki, float Kd) {
 	/* Konstruktor do obiekut PID_controller: PID, limitHigh, limitLow, Kp, Ki, Kd */
 
 	controller->limitHigh = limitHigh;
@@ -59,5 +62,6 @@ void set_PID_params(sPID_controller *controller, float limitHigh, float limitLow
 	controller->yi = 0; // wyjscie calkujace
 	controller->yp = 0; // wyjscie proporcjonalne
 	controller->yd = 0; // wyjscie rozniczkujace
+	controller->yd_p = 0.1;
 	controller->y_out = 0; // wyjscie jako suma PID
 }

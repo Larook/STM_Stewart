@@ -28,6 +28,8 @@ struct sEnvironment* ptr_env = &env; // wskaznik do adresu environment
 struct sTouchPanel* ptr_touchPanel = &touchPanel;
 
 struct sPID_controller* ptr_PIDx = &PIDx;
+//int x_ref = 100;
+
 struct sPID_controller* ptr_PIDy = &PIDy;
 
 int8_t prevState = 1; // najpierw byl wylaczony
@@ -99,8 +101,9 @@ int main(void) {
 
 	delay_ms(200);
 
-	set_PID_params(&PIDx, 100, -100, 1, 0, 0); //konstruktor do regulatora PID osi X
-	set_PID_params(&PIDy, 100, -100, 1, 0, 0); //konstruktor do regulatora PID osi Y
+	set_PID_params(&PIDx, 1000, -1000, 0.2, 0.018, 0); //konstruktor do regulatora PID osi X
+	PIDx.x_in = 100; // ref
+	set_PID_params(&PIDy, 100, -100, 1.5, 0, 0); //konstruktor do regulatora PID osi Y
 
 	init_timer_touch(); // wlaczenie przerwan do sczytywania danych z sensorow
 	//------------------------------
@@ -184,11 +187,16 @@ void TIM2_IRQHandler() {
 //			printf("Xpanel_r = %d\t\t Ypanel_r = %d\n\r", env_pointer->X_Real,
 //					env_pointer->Y_Real);
 
+			PIDx.x_in = 200 - PIDx.y_out;
+			get_PID_output(&PIDx, 50.000);
+
 			printf(
 					"\nX = %d   \t Y = %d   \t Z = %d   \t Xpanel_r = %d   \t Ypanel_r = %d   \t\t Roll = %d   \t Pitch = %d   \t Yaw = %d\n\r",
 					ptr_env->PlatformX, ptr_env->PlatformY, ptr_env->PlatformZ,
 					ptr_env->X_Real, ptr_env->Y_Real, ptr_env->Roll,
 					ptr_env->Pitch, ptr_env->Yaw);
+
+//			PIDx.x_in = PIDx.x_in - PIDx.y_out;
 
 		}
 	}

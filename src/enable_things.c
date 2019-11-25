@@ -15,7 +15,7 @@ void init_timer_touch() {
 	TIM_TimeBaseStructInit(&tim);
 	tim.TIM_CounterMode = TIM_CounterMode_Up;
 	tim.TIM_Prescaler = 64000 - 1;
-	tim.TIM_Period = 25 - 1; // bylo na 10 i smigalo jak nie bylo ruchu
+	tim.TIM_Period = 25 - 1; // 2x; bylo na 10 i smigalo jak nie bylo ruchu
 	TIM_TimeBaseInit(TIM2, &tim);
 
 	nvic.NVIC_IRQChannel = TIM2_IRQn;
