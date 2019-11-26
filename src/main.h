@@ -51,8 +51,12 @@ struct sEnvironment {
 	uint16_t Y_TouchPanel;
 
 	// podane w [mm]
-	int8_t X_Real;
-	int8_t Y_Real;
+	float X_Real;
+	float Y_Real;
+
+	float next_angle_Roll;
+	float next_angle_Pitch;
+
 } env;
 
 

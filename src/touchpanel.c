@@ -162,22 +162,22 @@ void init_touchPointsCalibration(struct sTouchPanel *panel_pointer) {
 //			panel_pointer->beta_y, panel_pointer->delta_y);
 }
 
-uint8_t* getPtrRealTouchArray(uint16_t touchX, uint16_t touchY,
+int16_t* getPtrRealTouchArray(uint16_t touchX, uint16_t touchY,
 		struct sTouchPanel* panel_pointer) {
-	/* zwraca wskaznik do tablicy
+	/* zwraca wskaznik do tablicy przechowujacej wspolrzedne X, Y [mm]
 	 * https://www.geeksforgeeks.org/return-local-array-c-function/  na dole
 	 * */
-	static uint8_t data_output[2]; // tworzy statyczna tablice - stale znane miejsce w pamieci
+	static int16_t data_output[2]; // tworzy statyczna tablice - stale znane miejsce w pamieci
 
 	/* Oblicza wsp rzeczywiste na podstawie macierzy kalibracji */
-	int x_real = touchX * panel_pointer->alpha_x
-			+ touchY * panel_pointer->beta_x + panel_pointer->delta_x;
-	int y_real = touchX * panel_pointer->alpha_y
-			+ touchY * panel_pointer->beta_y + panel_pointer->delta_y;
+	int x_real = (touchX * panel_pointer->alpha_x
+			+ touchY * panel_pointer->beta_x + panel_pointer->delta_x) / 100; // /100 zeby dojsc do mm
+	int y_real = (touchX * panel_pointer->alpha_y
+			+ touchY * panel_pointer->beta_y + panel_pointer->delta_y) / 100;
 
-	data_output[0] = x_real/100; // sprowadza do mm
-	data_output[1] = y_real/100;
-//	float data_output[] = { x_real, y_real };
+	data_output[0] = x_real; // [mm]
+	data_output[1] = y_real;
+
 	return data_output; // zwraca tablice, ale tak naprawde jednak wskaznik
 
 }

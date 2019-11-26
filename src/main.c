@@ -102,14 +102,13 @@ int main(void) {
 	delay_ms(200);
 
 	set_PID_params(&PIDx, 1000, -1000, 0.2, 0.018, 0); //konstruktor do regulatora PID osi X
-	PIDx.x_in = 100; // ref
 	set_PID_params(&PIDy, 100, -100, 1.5, 0, 0); //konstruktor do regulatora PID osi Y
 
 	init_timer_touch(); // wlaczenie przerwan do sczytywania danych z sensorow
 	//------------------------------
 
 	while (1) {
-		moveCircle(6, 3, env); // nowe
+//		moveCircle(20, 5, env); // nowe
 	}
 
 }
@@ -177,26 +176,47 @@ void TIM2_IRQHandler() {
 			GPIO_Init(GPIOC, &gpio); // black read
 
 			// zmienna wskaznikowa pod adres funkcji
-			uint8_t* real_ptr = getPtrRealTouchArray(ptr_env->X_TouchPanel,
+			int16_t* real_ptr = getPtrRealTouchArray(ptr_env->X_TouchPanel,
 					ptr_env->Y_TouchPanel, ptr_touchPanel);
 
 			// przypisz tablice z pomiarami do sEnvironment
 			ptr_env->X_Real = -1 * real_ptr[0];
 			ptr_env->Y_Real = real_ptr[1];
 
-//			printf("Xpanel_r = %d\t\t Ypanel_r = %d\n\r", env_pointer->X_Real,
-//					env_pointer->Y_Real);
+//			printf(
+//					"X: sense = %d   real = %f\t\t Y: sense = %d   real = %f\n\r",
+//					ptr_env->X_TouchPanel, ptr_env->X_Real,
+//					ptr_env->Y_TouchPanel, ptr_env->Y_Real);
 
-			PIDx.x_in = 200 - PIDx.y_out;
-			get_PID_output(&PIDx, 50.000);
+			/* TESTOWANIE PID: 1-error[x], 2-PID, 3-PIDout->angle, 4-angle->move*/
+			PIDx.x_in = ptr_env->PlatformX - ptr_env->X_Real; // joystick - zmierzone
+			PIDy.x_in = ptr_env->PlatformY - ptr_env->Y_Real; // joystick - zmierzone
+
+//			PIDx.x_in = 100 - PIDx.y_out;
+			get_PID_output(&PIDx, 50.000); // ms przerwania niby, ale nie ma porownania
+			get_PID_output(&PIDy, 50.000);
+
+			ptr_env->next_angle_Pitch = -1*get_angle_from_PID_output(&PIDx, 0.4,
+					50.0) * 57.3; // czy przesuwa prev wartosci?
+			ptr_env->next_angle_Roll = -1*get_angle_from_PID_output(&PIDy, 0.4,
+					50.0) * 57.3;
+
+			//Dlaczego dziala tylko PIDy? Dlaczego Roll jest mylony z Pitch? Jaka ma byc wartosc const w get_angle_from_PID?
+			//zrob ruch - czyli rob ruch ze struktury, ktora sie updateuje w przerwaniach
+			movePlatformFromTranslation_RPY(0, 0, ptr_env->PlatformZ,
+					0, ptr_env->next_angle_Pitch, 0);
 
 			printf(
-					"\nX = %d   \t Y = %d   \t Z = %d   \t Xpanel_r = %d   \t Ypanel_r = %d   \t\t Roll = %d   \t Pitch = %d   \t Yaw = %d\n\r",
+					"\nX = %d   \t Y = %d   \t Z = %d   \t Xpanel_r = %f   \t Ypanel_r = %f   \t\t Roll = %f   \t Pitch = %f  \n\r",
 					ptr_env->PlatformX, ptr_env->PlatformY, ptr_env->PlatformZ,
-					ptr_env->X_Real, ptr_env->Y_Real, ptr_env->Roll,
-					ptr_env->Pitch, ptr_env->Yaw);
+					ptr_env->X_Real, ptr_env->Y_Real, ptr_env->next_angle_Roll,
+					ptr_env->next_angle_Pitch);
 
-//			PIDx.x_in = PIDx.x_in - PIDx.y_out;
+//			printf(
+//					"\nX = %d   \t Y = %d   \t Z = %d   \t Xpanel_r = %f   \t Ypanel_r = %f   \t\t Roll = %d   \t Pitch = %d   \t Yaw = %d\n\r",
+//					ptr_env->PlatformX, ptr_env->PlatformY, ptr_env->PlatformZ,
+//					ptr_env->X_Real, ptr_env->Y_Real, ptr_env->Roll,
+//					ptr_env->Pitch, ptr_env->Yaw);
 
 		}
 	}

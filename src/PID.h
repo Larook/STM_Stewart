@@ -30,6 +30,8 @@ typedef struct {
 	float yd_p;
 
 	float y_out; // wyjscie jako suma PID
+	float y_out_p; // y(n-1)
+	float y_out_pp; // y(n-2)
 
 } sPID_controller;
 
@@ -37,7 +39,9 @@ sPID_controller PIDx; // globalny regulator PIDx
 sPID_controller PIDy;
 
 float get_PID_output(sPID_controller *controller, int Ts);
-void set_PID_params(sPID_controller *controller, float limitHigh, float limitLow,
-		float Kp, float Ki, float Kd);
+float get_angle_from_PID_output(sPID_controller *controller,
+		float g_inertia_const, float Ts);
+void set_PID_params(sPID_controller *controller, float limitHigh,
+		float limitLow, float Kp, float Ki, float Kd);
 
 #endif /* PID_H_ */
