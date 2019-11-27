@@ -177,7 +177,7 @@ int getServXAngleOfPosY(int serwo, double pos) { //USED
 void moveServXPosY(int serwo, double pos) { //USED NAJBARDZIEJ
 //piszesz ktore serwo i na jaka pozycje ma sie ruszyc
 // wybieram serwo i chce mu zadac pozycje, ale pozycje trzeba zamienic w kat a kat w ticksy
-	if ((pos >= -36) & (pos <= 29)) { // przyjmuje katy od -35 do 30
+	if ((pos >= -35) & (pos <= 25)) { // przyjmuje katy od -36 do 29
 		switch (serwo) {
 		case 1:
 			// pozycje ustawia przez odczytanie jakie ma byc wypelnienie zeby ustawic TeSerwo na TaPozycje
@@ -208,7 +208,7 @@ void moveServXPosY(int serwo, double pos) { //USED NAJBARDZIEJ
 			break;
 		}
 	} else {
-		printf("\tZle zadany kat\n\r");
+		printf("\tZle zadany kat(%f_deg) dla serwa:%d\n\r", pos, serwo);
 	}
 }
 
@@ -226,18 +226,19 @@ void moveCircle(double radius, double T_round, struct sEnvironment environment) 
 	// trzeba zadawac staly RPM
 	for (step; phi < 6.28; step++) {
 		phi += 6.283 * ms_t / (T_round * 1000);
-		x = radius * cos(1*phi);
-		y = radius * sin(1*phi);
+		x = radius * cos(1 * phi);
+		y = radius * sin(1 * phi);
 
 //		printf("\nstep %3d | kat=%3.2f[st]  x=%.1f  y=%.1f", step, phi * 57.3,
 //				x, y);
 
-		movePlatformFromTranslation_RPY(1*x+environment.PlatformX, 1*y+environment.PlatformY, environment.PlatformZ, 0*4 * sin(1*phi),
-				0*4 * cos(1*phi), 0*5* sin(phi));
+		movePlatformFromTranslation_RPY(1 * x + environment.PlatformX,
+				1 * y + environment.PlatformY, environment.PlatformZ,
+				0 * 4 * sin(1 * phi), 0 * 4 * cos(1 * phi), 0 * 5 * sin(phi));
 
 		/*
 		 * movePlatformFromTranslation_RPY(1*x+tx, 1*y+ty, -9 + 9 * sin(3*phi), 0*4 * sin(1*phi),
-				0*4 * cos(1*phi), 0*5* sin(phi));
+		 0*4 * cos(1*phi), 0*5* sin(phi));
 		 */
 		delay_ms(ms_t - ms_oper);
 	}
@@ -256,16 +257,17 @@ void moveCircle2(double radius, double T_round, double tx, double ty, double tz)
 	// trzeba zadawac staly RPM
 	for (step; phi < 6.28; step++) {
 		phi += 6.283 * ms_t / (T_round * 1000);
-		x = radius * cos(1*phi);
-		y = radius * sin(1*phi);
+		x = radius * cos(1 * phi);
+		y = radius * sin(1 * phi);
 
 		//tz = -11 - getZPotentiometer();
 
 		printf("\nstep %3d | kat=%3.2f[st]  x=%.1f  y=%.1f", step, phi * 57.3,
 				x, y);
 
-		movePlatformFromTranslation_RPY(1*x+tx, 1*y+ty, -9 + 9 * sin(3*phi), 0*4 * sin(1*phi),
-				0*4 * cos(1*phi), 0*5* sin(phi));
+		movePlatformFromTranslation_RPY(1 * x + tx, 1 * y + ty,
+				-9 + 9 * sin(3 * phi), 0 * 4 * sin(1 * phi),
+				0 * 4 * cos(1 * phi), 0 * 5 * sin(phi));
 		delay_ms(ms_t - ms_oper);
 	}
 }

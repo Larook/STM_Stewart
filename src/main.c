@@ -196,15 +196,13 @@ void TIM2_IRQHandler() {
 			get_PID_output(&PIDx, 50.000); // ms przerwania niby, ale nie ma porownania
 			get_PID_output(&PIDy, 50.000);
 
-			ptr_env->next_angle_Pitch = -1*get_angle_from_PID_output(&PIDx, 0.4,
-					50.0) * 57.3; // czy przesuwa prev wartosci?
-			ptr_env->next_angle_Roll = -1*get_angle_from_PID_output(&PIDy, 0.4,
-					50.0) * 57.3;
+			ptr_env->next_angle_Pitch = -1 * get_angle_from_PID_output(&PIDx, 0.5,
+					50.0) * 57.3; // osia X steruje Pitch   5.3
+			ptr_env->next_angle_Roll = get_angle_from_PID_output(&PIDy, 0.45, 50.0) * 57.3; // osia Y steruje Roll
 
-			//Dlaczego dziala tylko PIDy? Dlaczego Roll jest mylony z Pitch? Jaka ma byc wartosc const w get_angle_from_PID?
-			//zrob ruch - czyli rob ruch ze struktury, ktora sie updateuje w przerwaniach
+			//zrob ruch - najlepiej ze struktury, ktora sie updateuje w przerwaniach
 			movePlatformFromTranslation_RPY(0, 0, ptr_env->PlatformZ,
-					0, ptr_env->next_angle_Pitch, 0);
+					ptr_env->next_angle_Roll, ptr_env->next_angle_Pitch, 0);
 
 			printf(
 					"\nX = %d   \t Y = %d   \t Z = %d   \t Xpanel_r = %f   \t Ypanel_r = %f   \t\t Roll = %f   \t Pitch = %f  \n\r",
