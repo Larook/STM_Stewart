@@ -20,6 +20,7 @@ typedef struct {
 	float Kd;
 
 	float x_in; // wejscie
+	float x_in_p;
 
 	float yi_p; // poprzednia wartosc wyjscia calkujacego
 	float yi; // wyjscie calkujace

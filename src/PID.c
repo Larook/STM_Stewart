@@ -16,20 +16,25 @@ float get_PID_output(sPID_controller *controller, int Ts) { // trzeba dobrac Ts 
 
 //	float y_prev = controller->y_out; // wartosc poprzednia do okreslenia , czy wchodzic do anti-windupu
 	/* Updateowanie poprzednich wartosci*/
+
 	controller->yi_p = controller->yi; // poprzednio obliczone yi
 	controller->yd_p = controller->yd;
 
 	controller->y_out_pp = controller->y_out_p;
 	controller->y_out_p = controller->y_out;
 
-
 	/* Saturacja i anti-windup */
 	// jesli chce przekroczyc granice, to na to nie pozwol, nie calkuj
 	if (((controller->y_out_p > controller->limitHigh) && (controller->x_in > 0))
-			|| ((controller->y_out_p < controller->limitLow) && (controller->x_in < 0))) {
+			|| ((controller->y_out_p < controller->limitLow)
+					&& (controller->x_in < 0))) {
 		controller->yi = controller->yi_p;
 
 	} else { // normalnie oblicz yi_out (calkuj)
+
+//		 Z wpisaniem sampling Time
+//		controller->yi = controller->Ki * controller->x_in * Ts
+//				+ controller->yi_p; // I
 
 		controller->yi = controller->Ki * controller->x_in * Ts
 				+ controller->yi_p; // I
@@ -37,18 +42,26 @@ float get_PID_output(sPID_controller *controller, int Ts) { // trzeba dobrac Ts 
 	/* Po obliczeniu I licz dalej wyjscie P i D */
 
 	controller->yp = controller->Kp * controller->x_in; // P
-	controller->yd = controller->Kd * (controller->yd - controller->yd_p) / Ts; // D
+//	controller->yd = controller->Kd * (controller->yd - controller->yd_p) / Ts; // D
+
+	controller->yd = controller->Kd * (controller->x_in - controller->y_out - controller->y_out_p + controller->x_in_p); // D = error - last error
 
 	controller->y_out = controller->yp + controller->yi + controller->yd;
 
+	controller->x_in_p = controller->x_in;
 	return controller->y_out;
 }
 
 float get_angle_from_PID_output(sPID_controller *controller,
 		float g_inertia_const, float Ts) {
 	// x.. = const * rad
+
+// z wrzuceniem sampling time
 	float angle_rad = (controller->y_out - 2 * controller->y_out_p
 			- controller->y_out_pp) / Ts / Ts / g_inertia_const;
+
+//	float angle_rad = (controller->y_out - 2 * controller->y_out_p
+//			- controller->y_out_pp) / g_inertia_const;
 
 	return angle_rad;
 }
