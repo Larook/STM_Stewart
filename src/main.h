@@ -57,7 +57,12 @@ struct sEnvironment {
 	float next_angle_Roll;
 	float next_angle_Pitch;
 
+	// katy, ktore trzeba nadac zeby talerz byl rzeczywiscie poziomo
+	float roll_level_bias;
+	float pitch_level_bias;
+
 } env;
+
 
 
 //struct Environments env; // w tym srodowisku uzupelnij zmierzone pomiary

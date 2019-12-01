@@ -25,6 +25,7 @@ volatile uint32_t timer_ms = 0;
 
 /* GLOBALNE WSKAZNIKI DO STRUKTUR*/
 struct sEnvironment* ptr_env = &env; // wskaznik do adresu environment
+
 struct sTouchPanel* ptr_touchPanel = &touchPanel;
 
 struct sPID_controller* ptr_PIDx = &PIDx;
@@ -99,10 +100,23 @@ int main(void) {
 //	lcd_send_4bit(0x00); // zgas
 	printf("po wyslaniu \n\r");
 
+	// stale pozwalajace ustawic platforme w rzeczywistym poziomie
+	ptr_env->roll_level_bias = 2.4;
+	ptr_env->pitch_level_bias = 1.6;
+
 	delay_ms(200);
 
-	set_PID_params(&PIDx, 1000, -1000, 0.2, 0.018, 0); //konstruktor do regulatora PID osi X
-	set_PID_params(&PIDy, 100, -100, 1.5, 0, 0); //konstruktor do regulatora PID osi Y
+//	Proba z regulatorem PD
+	set_PID_params(&PIDx, 1100, -1100, 2, 0, 10); //konstruktor do regulatora PID osi X D=0.0001
+	set_PID_params(&PIDy, 1100, -1100, 2, 0, 10); //konstruktor do regulatora PID osi Y D=0.0001
+
+//	Niby ok, ale nadal jest spore opoznienie, spory lag - albo duzo szybciej przerwania, albo zmienic podejscie troche
+//	set_PID_params(&PIDx, 1100, -1100, 0.2, 1.8, 0.3); //konstruktor do regulatora PID osi X
+//	set_PID_params(&PIDy, 1100, -1100, 0.2, 1.8, 0.3); //konstruktor do regulatora PID osi Y
+
+// Raczej zle - kulka w osi y duzo szybciej niz totalnie wolna w osi x
+//	set_PID_params(&PIDx, 1000, -1000, 0.2, 0.018, 0); //konstruktor do regulatora PID osi X
+//		set_PID_params(&PIDy, 100, -100, 1.5, 0, 0); //konstruktor do regulatora PID osi Y
 
 	init_timer_touch(); // wlaczenie przerwan do sczytywania danych z sensorow
 	//------------------------------
@@ -196,13 +210,26 @@ void TIM2_IRQHandler() {
 			get_PID_output(&PIDx, 50.000); // ms przerwania niby, ale nie ma porownania
 			get_PID_output(&PIDy, 50.000);
 
-			ptr_env->next_angle_Pitch = -1 * get_angle_from_PID_output(&PIDx, 0.5,
-					50.0) * 57.3; // osia X steruje Pitch   5.3
-			ptr_env->next_angle_Roll = get_angle_from_PID_output(&PIDy, 0.45, 50.0) * 57.3; // osia Y steruje Roll
+//			ptr_env -> roll_level_bias = 4;
+//			ptr_env -> pitch_level_bias = 1.6;
+
+//			ptr_env->next_angle_Pitch = -1 * get_angle_from_PID_output(&PIDx, 0.7,
+//								50.0) * 57.3 + ptr_env -> pitch_level_bias; // osia X steruje Pitch   5.3
+//						ptr_env->next_angle_Roll = get_angle_from_PID_output(&PIDy, 0.7, 50.0) * 57.3 + ptr_env -> roll_level_bias; // osia Y steruje Roll 0.45
+
+			ptr_env->next_angle_Pitch = -1
+					* get_angle_from_PID_output(&PIDx, 0.8, 50.0) * 57.3
+					+ ptr_env->pitch_level_bias; // osia X steruje Pitch   5.3
+
+			ptr_env->next_angle_Roll = get_angle_from_PID_output(&PIDy, 0.8, 50.0)
+					* 57.3 + ptr_env->roll_level_bias; // osia Y steruje Roll 0.45
 
 			//zrob ruch - najlepiej ze struktury, ktora sie updateuje w przerwaniach
+//			movePlatformFromTranslation_RPY(0, 0, ptr_env->PlatformZ,
+//					ptr_env->next_angle_Roll, ptr_env->next_angle_Pitch, 0);
+
 			movePlatformFromTranslation_RPY(0, 0, ptr_env->PlatformZ,
-					ptr_env->next_angle_Roll, ptr_env->next_angle_Pitch, 0);
+					0, 0, 0);
 
 			printf(
 					"\nX = %d   \t Y = %d   \t Z = %d   \t Xpanel_r = %f   \t Ypanel_r = %f   \t\t Roll = %f   \t Pitch = %f  \n\r",
