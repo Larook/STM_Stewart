@@ -101,14 +101,15 @@ int main(void) {
 	printf("po wyslaniu \n\r");
 
 	// stale pozwalajace ustawic platforme w rzeczywistym poziomie
-	ptr_env->roll_level_bias = 1.2;
-	ptr_env->pitch_level_bias = -0.4;
+	ptr_env->roll_level_bias = -0.4;
+	ptr_env->pitch_level_bias = - 0.7;
 
 	delay_ms(200);
 
 //	Proba z regulatorem PD
-	set_PID_params(&PIDx, 1100, -1100, 0.01, 0, 1); //konstruktor do regulatora PID osi X D=0.0001
-	set_PID_params(&PIDy, 1100, -1100, 0.01, 0, 1); //konstruktor do regulatora PID osi Y D=0.0001
+//	set_PID_params(&PIDx, 1100, -1100, 0.00000001, 0, 0.000019); calkiem niezle
+	set_PID_params(&PIDx, 1100, -1100, 0.000000015, 0, 0.000023); //konstruktor do regulatora PID osi X D=0.0001
+	set_PID_params(&PIDy, 1100, -1100, 0.000000015, 0, 0.000023); //konstruktor do regulatora PID osi Y D=0.0001
 
 //	Niby ok, ale nadal jest spore opoznienie, spory lag - albo duzo szybciej przerwania, albo zmienic podejscie troche
 //	set_PID_params(&PIDx, 1100, -1100, 0.2, 1.8, 0.3); //konstruktor do regulatora PID osi X
@@ -203,12 +204,12 @@ void TIM2_IRQHandler() {
 //					ptr_env->Y_TouchPanel, ptr_env->Y_Real);
 
 			/* TESTOWANIE PID: 1-error[x], 2-PID, 3-PIDout->angle, 4-angle->move*/
-			PIDx.x_in = ptr_env->PlatformX - ptr_env->X_Real; // joystick - zmierzone
-			PIDy.x_in = ptr_env->PlatformY - ptr_env->Y_Real; // joystick - zmierzone
+			PIDx.e_in = ptr_env->PlatformX - ptr_env->X_Real; // joystick - zmierzone
+			PIDy.e_in = ptr_env->PlatformY - ptr_env->Y_Real; // joystick - zmierzone
 
 //			PIDx.x_in = 100 - PIDx.y_out;
-			get_PID_output(&PIDx, 50.000); // ms przerwania niby, ale nie ma porownania
-			get_PID_output(&PIDy, 50.000);
+			get_PID_output(&PIDx, 0.05); // ms przerwania niby, ale nie ma porownania
+			get_PID_output(&PIDy, 0.05);
 
 //			ptr_env -> roll_level_bias = 4;
 //			ptr_env -> pitch_level_bias = 1.6;
@@ -217,11 +218,13 @@ void TIM2_IRQHandler() {
 //								50.0) * 57.3 + ptr_env -> pitch_level_bias; // osia X steruje Pitch   5.3
 //						ptr_env->next_angle_Roll = get_angle_from_PID_output(&PIDy, 0.7, 50.0) * 57.3 + ptr_env -> roll_level_bias; // osia Y steruje Roll 0.45
 
+			// 0.05s = 50ms = okres przerwan
+
 			ptr_env->next_angle_Pitch = -1
-					* get_angle_from_PID_output(&PIDx, 9.71, 50.0) * 57.3
+					* get_angle_from_PID_output(&PIDx, 9.71, 0.05) * 57.3
 					+ ptr_env->pitch_level_bias; // osia X steruje Pitch   5.3
 
-			ptr_env->next_angle_Roll = get_angle_from_PID_output(&PIDy, 9.71, 50.0)
+			ptr_env->next_angle_Roll = get_angle_from_PID_output(&PIDy, 9.71, 0.05)
 					* 57.3 + ptr_env->roll_level_bias; // osia Y steruje Roll 0.45
 
 			//zrob ruch - najlepiej ze struktury, ktora sie updateuje w przerwaniach

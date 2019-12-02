@@ -177,39 +177,49 @@ int getServXAngleOfPosY(int serwo, double pos) { //USED
 void moveServXPosY(int serwo, double pos) { //USED NAJBARDZIEJ
 //piszesz ktore serwo i na jaka pozycje ma sie ruszyc
 // wybieram serwo i chce mu zadac pozycje, ale pozycje trzeba zamienic w kat a kat w ticksy
-	if ((pos >= -35) & (pos <= 25)) { // przyjmuje katy od -36 do 29
-		switch (serwo) {
-		case 1:
-			// pozycje ustawia przez odczytanie jakie ma byc wypelnienie zeby ustawic TeSerwo na TaPozycje
-			TIM_SetCompare1(TIM3,
-					AngleToTicks(getServXAngleOfPosY(serwo, pos + 35))); //dodany offset zeby zadane 0 stawialo serwo w pozycji horyzontalnej
-			break;
-		case 2:
-			TIM_SetCompare2(TIM3,
-					AngleToTicks(getServXAngleOfPosY(serwo, pos + 35)));
-			break;
-		case 3:
-			TIM_SetCompare3(TIM3,
-					AngleToTicks(getServXAngleOfPosY(serwo, pos + 30)));
-			break;
-		case 4:
-			TIM_SetCompare4(TIM3,
-					AngleToTicks(getServXAngleOfPosY(serwo, pos + 30)));
-			break;
-		case 5:
-			TIM_SetCompare3(TIM4,
-					AngleToTicks(getServXAngleOfPosY(serwo, pos + 32)));
-			break;
-		case 6:
-			TIM_SetCompare4(TIM4,
-					AngleToTicks(getServXAngleOfPosY(serwo, pos + 37)));
-			break;
-		default:
-			break;
-		}
-	} else {
+
+	/* Jesli chcesz przekroczyc granice, to ustaw serwo na tej granicy */
+	int8_t limit_up = 35;
+	int8_t limit_down = -20;
+
+	if (pos < limit_down) {
 		printf("\tZle zadany kat(%f_deg) dla serwa:%d\n\r", pos, serwo);
+		pos = limit_down;
 	}
+	if (pos > limit_up) {
+		printf("\tZle zadany kat(%f_deg) dla serwa:%d\n\r", pos, serwo);
+		pos = limit_up;
+	}
+	switch (serwo) {
+	case 1:
+		// pozycje ustawia przez odczytanie jakie ma byc wypelnienie zeby ustawic TeSerwo na TaPozycje
+		TIM_SetCompare1(TIM3,
+				AngleToTicks(getServXAngleOfPosY(serwo, pos + 35))); //dodany offset zeby zadane 0 stawialo serwo w pozycji horyzontalnej
+		break;
+	case 2:
+		TIM_SetCompare2(TIM3,
+				AngleToTicks(getServXAngleOfPosY(serwo, pos + 35)));
+		break;
+	case 3:
+		TIM_SetCompare3(TIM3,
+				AngleToTicks(getServXAngleOfPosY(serwo, pos + 30)));
+		break;
+	case 4:
+		TIM_SetCompare4(TIM3,
+				AngleToTicks(getServXAngleOfPosY(serwo, pos + 30)));
+		break;
+	case 5:
+		TIM_SetCompare3(TIM4,
+				AngleToTicks(getServXAngleOfPosY(serwo, pos + 32)));
+		break;
+	case 6:
+		TIM_SetCompare4(TIM4,
+				AngleToTicks(getServXAngleOfPosY(serwo, pos + 37)));
+		break;
+	default:
+		break;
+	}
+
 }
 
 /*		funkcje ruchu		*/
