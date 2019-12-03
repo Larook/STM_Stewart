@@ -28,6 +28,7 @@ float get_PID_output(sPID_controller *controller, int Ts) { // trzeba dobrac Ts 
 	if (((controller->y_out_p > controller->limitHigh) && (controller->e_in > 0))
 			|| ((controller->y_out_p < controller->limitLow)
 					&& (controller->e_in < 0))) {
+		printf("Anti-Windup! Przekroczono limit calkowania");
 		controller->yi = controller->yi_p;
 
 	} else { // normalnie oblicz yi_out (calkuj)

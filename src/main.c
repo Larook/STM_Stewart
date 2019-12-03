@@ -101,15 +101,15 @@ int main(void) {
 	printf("po wyslaniu \n\r");
 
 	// stale pozwalajace ustawic platforme w rzeczywistym poziomie
-	ptr_env->roll_level_bias = -0.4;
-	ptr_env->pitch_level_bias = - 0.7;
+	ptr_env->roll_level_bias = 0.9;
+	ptr_env->pitch_level_bias = -0.5;
 
 	delay_ms(200);
 
 //	Proba z regulatorem PD
 //	set_PID_params(&PIDx, 1100, -1100, 0.00000001, 0, 0.000019); calkiem niezle
-	set_PID_params(&PIDx, 1100, -1100, 0.000000015, 0, 0.000023); //konstruktor do regulatora PID osi X D=0.0001
-	set_PID_params(&PIDy, 1100, -1100, 0.000000015, 0, 0.000023); //konstruktor do regulatora PID osi Y D=0.0001
+	set_PID_params(&PIDx, 1100, -1100, 0.0000000164, 0.0904000658754995, 0.0000163); //konstruktor do regulatora PID osi X D=0.0001
+	set_PID_params(&PIDy, 1100, -1100, 0.0000000164, 0.0904000658754995, 0.0000163); //konstruktor do regulatora PID osi Y D=0.0001
 
 //	Niby ok, ale nadal jest spore opoznienie, spory lag - albo duzo szybciej przerwania, albo zmienic podejscie troche
 //	set_PID_params(&PIDx, 1100, -1100, 0.2, 1.8, 0.3); //konstruktor do regulatora PID osi X
