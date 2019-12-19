@@ -34,7 +34,7 @@ struct sPID_controller* ptr_PIDx = &PIDx;
 struct sPID_controller* ptr_PIDy = &PIDy;
 
 int8_t prevState = 1; // najpierw byl wylaczony
-int8_t doRPY = 0;
+int8_t ball_on_plate = 0;
 
 void SysTick_Handler() {
 	if (timer_ms)
@@ -101,15 +101,18 @@ int main(void) {
 	printf("po wyslaniu \n\r");
 
 	// stale pozwalajace ustawic platforme w rzeczywistym poziomie
-	ptr_env->roll_level_bias = 0.9;
-	ptr_env->pitch_level_bias = -0.5;
+	ptr_env->roll_level_bias = 1.4;
+	ptr_env->pitch_level_bias = -0.6;
 
 	delay_ms(200);
 
 //	Proba z regulatorem PD
 //	set_PID_params(&PIDx, 1100, -1100, 0.00000001, 0, 0.000019); calkiem niezle
-	set_PID_params(&PIDx, 1100, -1100, 0.0000000164, 0.0904000658754995, 0.0000163); //konstruktor do regulatora PID osi X D=0.0001
-	set_PID_params(&PIDy, 1100, -1100, 0.0000000164, 0.0904000658754995, 0.0000163); //konstruktor do regulatora PID osi Y D=0.0001
+//	set_PID_params(&PIDx, 1100, -1100, 0.0000020, 1820, 0.000019); lepiej
+//	set_PID_params(&PIDx, 1100, -1100, 0.0000013, 0xde, 0.000020); jeszcze lepiej
+//	set_PID_params(&PIDx, 1100, -1100, 0.0000013, 0xaefe, 0.000018); //konstruktor do regulatora PID osi X D=0.0001
+	set_PID_params(&PIDx, 1100, -1100, 0.0000004, 0.00000000000001, 0.000019); //konstruktor do regulatora PID osi X D=0.0001 I = 0.000000000000000001
+	set_PID_params(&PIDy, 1100, -1100, 0.0000004, 0.00000000000001, 0.000019); //konstruktor do regulatora PID osi Y D=0.0001
 
 //	Niby ok, ale nadal jest spore opoznienie, spory lag - albo duzo szybciej przerwania, albo zmienic podejscie troche
 //	set_PID_params(&PIDx, 1100, -1100, 0.2, 1.8, 0.3); //konstruktor do regulatora PID osi X
@@ -123,7 +126,28 @@ int main(void) {
 	//------------------------------
 
 	while (1) {
-//		moveCircle(20, 5, env); // nowe
+//		moveCircle(20, 7, env); // nowe
+//		moveCircle(20, 7, env); // nowe
+//
+//		moveZ(20, 7, env);
+//		moveZ(20, 7, env);
+//
+//		moveY(20, 7, env);
+//		moveY(20, 7, env);
+//
+//		moveRP(8, 1);
+//		moveRP(8, 1);
+//
+//		moveCircleZ(10, 7, env);
+//		moveCircleZ(10, 7, env);
+//		moveCircleZ(10, 7, env);
+//		moveCircleZ(10, 7, env);
+//
+//		moveWave(10, 10, env);
+//		moveWave(10, 10, env);
+//		moveWave(10, 10, env);
+//		moveWave(10, 10, env);
+//		delay_ms(1000);
 	}
 
 }
@@ -203,42 +227,62 @@ void TIM2_IRQHandler() {
 //					ptr_env->X_TouchPanel, ptr_env->X_Real,
 //					ptr_env->Y_TouchPanel, ptr_env->Y_Real);
 
-			/* TESTOWANIE PID: 1-error[x], 2-PID, 3-PIDout->angle, 4-angle->move*/
-			PIDx.e_in = ptr_env->PlatformX - ptr_env->X_Real; // joystick - zmierzone
-			PIDy.e_in = ptr_env->PlatformY - ptr_env->Y_Real; // joystick - zmierzone
+			/* Jesli wcisniety przycisk - rob balans pilki */
+			if (!ball_on_plate) {
 
-//			PIDx.x_in = 100 - PIDx.y_out;
-			get_PID_output(&PIDx, 0.05); // ms przerwania niby, ale nie ma porownania
-			get_PID_output(&PIDy, 0.05);
+				/* TESTOWANIE PID: 1-error[x], 2-PID, 3-PIDout->angle, 4-angle->move*/
+				PIDx.e_in = ptr_env->PlatformX - ptr_env->X_Real; // joystick - zmierzone
+				PIDy.e_in = ptr_env->PlatformY - ptr_env->Y_Real; // joystick - zmierzone
 
-//			ptr_env -> roll_level_bias = 4;
-//			ptr_env -> pitch_level_bias = 1.6;
+//				PIDx.x_in = 100 - PIDx.y_o
+				get_PID_output(&PIDx, 0.05); // ms przerwania niby, ale nie ma porownania
+				get_PID_output(&PIDy, 0.05);
 
-//			ptr_env->next_angle_Pitch = -1 * get_angle_from_PID_output(&PIDx, 0.7,
-//								50.0) * 57.3 + ptr_env -> pitch_level_bias; // osia X steruje Pitch   5.3
-//						ptr_env->next_angle_Roll = get_angle_from_PID_output(&PIDy, 0.7, 50.0) * 57.3 + ptr_env -> roll_level_bias; // osia Y steruje Roll 0.45
+				//			ptr_env->next_angle_Pitch = -1 * get_angle_from_PID_output(&PIDx, 0.7,
+				//								50.0) * 57.3 + ptr_env -> pitch_level_bias; // osia X steruje Pitch   5.3
+				//						ptr_env->next_angle_Roll = get_angle_from_PID_output(&PIDy, 0.7, 50.0) * 57.3 + ptr_env -> roll_level_bias; // osia Y steruje Roll 0.45
 
-			// 0.05s = 50ms = okres przerwan
+				// 0.05s = 50ms = okres przerwan
 
-			ptr_env->next_angle_Pitch = -1
-					* get_angle_from_PID_output(&PIDx, 9.71, 0.05) * 57.3
-					+ ptr_env->pitch_level_bias; // osia X steruje Pitch   5.3
+				//! TRZEBA POPRAWIC DRUGI - NA + !!!
+				ptr_env->next_angle_Pitch = -1
+						* get_angle_from_PID_output(&PIDx, 35, 0.05) * 57.3
+						; // osia X steruje Pitch   5.3   0,169721656 bylo 9.71 a potem 9.48
 
-			ptr_env->next_angle_Roll = get_angle_from_PID_output(&PIDy, 9.71, 0.05)
-					* 57.3 + ptr_env->roll_level_bias; // osia Y steruje Roll 0.45
+				ptr_env->next_angle_Roll = get_angle_from_PID_output(&PIDy,
+						35, 0.05) * 57.3 ; // osia Y steruje Roll 0.45   0,169721656
 
-			//zrob ruch - najlepiej ze struktury, ktora sie updateuje w przerwaniach
-			movePlatformFromTranslation_RPY(0, 0, ptr_env->PlatformZ,
-					ptr_env->next_angle_Roll, ptr_env->next_angle_Pitch, 0);
+				//zrob ruch - najlepiej ze struktury, ktora sie updateuje w przerwaniach
+				movePlatformFromTranslation_RPY(0, 0, ptr_env->PlatformZ,
+						ptr_env->next_angle_Roll + ptr_env->roll_level_bias, ptr_env->next_angle_Pitch+ ptr_env->pitch_level_bias, 0);
 
-//			movePlatformFromTranslation_RPY(0, 0, ptr_env->PlatformZ,
-//					ptr_env->roll_level_bias, ptr_env->pitch_level_bias, 0);
+				//			movePlatformFromTranslation_RPY(0, 0, ptr_env->PlatformZ, // levelowanie dobrego poziomu platformy
+				//					ptr_env->roll_level_bias, ptr_env->pitch_level_bias, 0);
+				printf(
+						"\nX = %d   \t Y = %d   \t Z = %d   \t Xpanel_r = %f   \t Ypanel_r = %f   \t\t Roll = %f   \t Pitch = %f  \n\r",
+						ptr_env->PlatformX, ptr_env->PlatformY,
+						ptr_env->PlatformZ, ptr_env->X_Real, ptr_env->Y_Real,
+						ptr_env->next_angle_Roll, ptr_env->next_angle_Pitch);
+			}
 
-			printf(
-					"\nX = %d   \t Y = %d   \t Z = %d   \t Xpanel_r = %f   \t Ypanel_r = %f   \t\t Roll = %f   \t Pitch = %f  \n\r",
-					ptr_env->PlatformX, ptr_env->PlatformY, ptr_env->PlatformZ,
-					ptr_env->X_Real, ptr_env->Y_Real, ptr_env->next_angle_Roll,
-					ptr_env->next_angle_Pitch);
+			/* Jesli przycisk nie wcisniety - rob ruch na podstawie joysticka*/
+			else {
+				movePlatformFromTranslation_RPY(ptr_env->PlatformX,
+						ptr_env->PlatformY, ptr_env->PlatformZ, ptr_env->Roll + ptr_env->roll_level_bias,
+						ptr_env->Pitch + ptr_env->pitch_level_bias, 0);
+
+//				movePlatformFromTranslation_RPY(ptr_env->PlatformX,
+//						ptr_env->PlatformY, ptr_env->PlatformZ,
+//						ptr_env->roll_level_bias, ptr_env->pitch_level_bias, 0);
+
+//				movePlatformFromTranslation_RPY(ptr_env->PlatformX, ptr_env->PlatformY, ptr_env->PlatformZ,
+//										0, 0, 0);
+				printf(
+						"\nX = %d   \t Y = %d   \t Z = %d   \t Xpanel_r = %f   \t Ypanel_r = %f   \t\t Roll = %f   \t Pitch = %f  \n\r",
+						ptr_env->PlatformX, ptr_env->PlatformY,
+						ptr_env->PlatformZ, ptr_env->X_Real, ptr_env->Y_Real,
+						ptr_env->Roll, ptr_env->Pitch);
+			}
 
 //			printf(
 //					"\nX = %d   \t Y = %d   \t Z = %d   \t Xpanel_r = %f   \t Ypanel_r = %f   \t\t Roll = %d   \t Pitch = %d   \t Yaw = %d\n\r",
@@ -264,14 +308,14 @@ void EXTI15_10_IRQHandler() {
 //			delay_ms(50);
 			prevState++;
 			GPIO_SetBits(GPIOA, GPIO_Pin_12);
-			doRPY = 1; // wcisniecie przycisku -> program z RPY
+			ball_on_plate = 1; // wcisniecie przycisku -> program z RPY
 
 		} else if ((GPIO_ReadInputDataBit(GPIOC, GPIO_Pin_10) == 0)
 				& (prevState % 2 == 1)) { //} & (isPressed == 1) ){
 //			delay_ms(50);
 			prevState--;
 			GPIO_ResetBits(GPIOA, GPIO_Pin_12);
-			doRPY = 0; //domyslnie program bez RPY
+			ball_on_plate = 0; //domyslnie program bez RPY
 		}
 
 		EXTI_ClearITPendingBit(EXTI_Line10);
@@ -279,7 +323,7 @@ void EXTI15_10_IRQHandler() {
 }
 
 void check_lcd() {
-	//Table 12 4-Bit Operation, 8-Digit ´ 1-Line Display Example with Internal Reset
+	//Table 12 4-Bit Operation, 8-Digit ï¿½ 1-Line Display Example with Internal Reset
 	// zamiast H wyszly 2 linie zapalone - trzeba przesledzic gdzie wychodza sciezki z i2c na disp
 	// step 2
 	lcd_send_4bit(0x02);

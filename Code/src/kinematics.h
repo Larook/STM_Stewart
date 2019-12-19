@@ -51,6 +51,10 @@ void moveServXPosY(int serwo, double pos);
 
 // trajektorie
 void moveCircle(double radius, double T_round, struct sEnvironment);
-void moveCircle2(double radius, double T_round, double tx, double ty, double tz);
+void moveCircleZ(double radius, double T_round, struct sEnvironment environment);
+void moveWave(double radius, double T_round, struct sEnvironment environment);
+void moveZ(double radius, double T_round, struct sEnvironment environment);
+void moveY(double radius, double T_round, struct sEnvironment environment);
+void moveRP(double radius, double T_round);
 
 #endif /* KINEMATICS_H_ */

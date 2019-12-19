@@ -28,23 +28,23 @@ void check_i2c_LSM303D() {
 	if (who_am_i == 0x49) {
 		printf("Znaleziono akcelerometr LSM303D\n");
 	} else {
-		printf("Nie LSM303D \n OdpowiedŸ uk³adu (0x%02X)\n", who_am_i);
+		printf("Nie LSM303D \n Odpowiedï¿½ ukï¿½adu (0x%02X)\n", who_am_i);
 	}
 }
 //---------------------- odczyty RPY ---------------------
-int getRollIMU() {
+float getRollIMU() {
 	int16_t a_y = lsm_read_value(LSM303D_OUT_Y_A);
 	int16_t a_z = lsm_read_value(LSM303D_OUT_Z_A);
 
 	double Ay = a_y * 2.0f / 32678.0f;
 	double Az = a_z * 2.0f / 32678.0f;
 
-	int roll_A = (atan2(Ay, Az) * 57.2958); //kondycjonowanie
+	float roll_A = (atan2(Ay, Az) * 57.2958); //kondycjonowanie
 
 	return roll_A ; // = 180 - roll_A;
 
 }
-int getPitchIMU() { //po co powtarzac te pomiary?
+float getPitchIMU() { //po co powtarzac te pomiary?
 	// moze w 1 metodzie zrobic wszystkie pomiary, a potem w jakims 32bitowym rejestrze to podzielic na 3?
 	//potem wyslac dane do maina i w mainie obliczac RPY?
 
@@ -58,10 +58,10 @@ int getPitchIMU() { //po co powtarzac te pomiary?
 	double Ay = a_y * 2.0f / 32678.0f;
 	double Az = a_z * 2.0f / 32678.0f;
 
-	int pitch_A = (atan2((-Ax), sqrt(Ay * Ay + Az * Az))) * 57.2958;
+	float pitch_A = (atan2((-Ax), sqrt(Ay * Ay + Az * Az))) * 57.2958;
 	return pitch_A;
 }
-int getYawIMU() {
+float getYawIMU() {
 	int16_t m_x = lsm_read_value(LSM303D_OUT_X_M);
 	int16_t m_y = lsm_read_value(LSM303D_OUT_Y_M);
 
@@ -69,7 +69,7 @@ int getYawIMU() {
 	double Hx = m_x * 2.00f / 32678.00f; // te -1 sprawiaja, ze acc i magn maja pomiary w fazie
 	double Hy = m_y * 2.00f / 32678.00f; //*2 zeby byla ilosc w Gaussach
 
-	int yaw_M = atan2(Hy, Hx) * 57.2958 + 180;
+	float yaw_M = atan2(Hy, Hx) * 57.2958 + 180;
 	yaw_M -= 225; // sam ustalam gdzie jest polnoc
 	return yaw_M;
 }
@@ -107,7 +107,7 @@ void get_Magnetometer2() {
 	//1T =10e4Gauss
 	//45e-6 T = 45e-2Gauss=0,45Gauss
 
-	// na rejestrach HIGH tez sa wartoœci, ale jakies randomowe
+	// na rejestrach HIGH tez sa wartoï¿½ci, ale jakies randomowe
 
 	int16_t m_x = lsm_read_value(LSM303D_OUT_X_M);
 //	m_xh = lsm_read_value(LSM303D_OUT_X_M_H);
@@ -142,7 +142,7 @@ void get_Magnetometer() {
 	//1T =10e4Gauss
 	//45e-6 T = 45e-2Gauss=0,45Gauss
 
-	// na rejestrach HIGH tez sa wartoœci, ale jakies randomowe
+	// na rejestrach HIGH tez sa wartoï¿½ci, ale jakies randomowe
 
 	int16_t m_x = lsm_read_value(LSM303D_OUT_X_M);
 //	m_xh = lsm_read_value(LSM303D_OUT_X_M_H);
@@ -198,7 +198,7 @@ void set_default_Magnetometer() {
 	lsm_write_reg(LSM303D_CTRL6, 0x00); // bylo 0x20
 	printf("Teraz:  LSM303D_CTRL6 = 0x%x \n", lsm_read_reg(LSM303D_CTRL6));
 
-	//CTRL7 Ustawienie ci¹g³ego trybu pracy
+	//CTRL7 Ustawienie ciï¿½gï¿½ego trybu pracy
 	lsm_write_reg(LSM303D_CTRL7, 0x00); //bylo 0x3
 	printf("Teraz:  LSM303D_CTRL7 = 0x%x \n", lsm_read_reg(LSM303D_CTRL7));
 }
@@ -224,7 +224,7 @@ void set_pomiary_Magnetometer() {
 	lsm_write_reg(LSM303D_CTRL6, 1 << 6); // bylo 0x20
 	printf("Teraz:  LSM303D_CTRL6 = 0x%x \n", lsm_read_reg(LSM303D_CTRL6));
 
-	//CTRL7 Ustawienie ci¹g³ego trybu pracy
+	//CTRL7 Ustawienie ciï¿½gï¿½ego trybu pracy
 	lsm_write_reg(LSM303D_CTRL7, 0x00); //bylo 0x3
 	printf("Teraz:  LSM303D_CTRL7 = 0x%x \n", lsm_read_reg(LSM303D_CTRL7));
 }

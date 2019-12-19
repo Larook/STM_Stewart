@@ -4,7 +4,7 @@
  *  Created on: 19.11.2019
  *      Author: PiK
  *
- * Utworzenie struktury regulatora PID. Wykorzystane bêd¹ dwa takie obiekty struktury, jedna do kontroli osi X, a druga do osi Y
+ * Utworzenie struktury regulatora PID. Wykorzystane bï¿½dï¿½ dwa takie obiekty struktury, jedna do kontroli osi X, a druga do osi Y
  *
  */
 
@@ -38,7 +38,7 @@ float get_PID_output(sPID_controller *controller, int Ts) { // trzeba dobrac Ts 
 //				+ controller->yi_p; // I
 
 		controller->yi = controller->Ki * controller->e_in * Ts
-				+ controller->yi_p; // I
+				+ controller->y_out_p; // I  bylo wczesniej yi_p
 	}
 	/* Po obliczeniu I licz dalej wyjscie P i D */
 

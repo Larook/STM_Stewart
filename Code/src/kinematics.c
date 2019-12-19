@@ -12,7 +12,7 @@
 #include "main.h"
 
 /*			Zmienne 					*/
-//k¹t beta ustawienia serwa na p³aszczyŸnie XY
+//kï¿½t beta ustawienia serwa na pï¿½aszczyï¿½nie XY
 double Betak[6] = { 0, 180, 120, 300, 240, 60 };
 
 //pkty snapa przy serwie
@@ -243,7 +243,7 @@ void moveCircle(double radius, double T_round, struct sEnvironment environment) 
 //				x, y);
 
 		movePlatformFromTranslation_RPY(1 * x + environment.PlatformX,
-				1 * y + environment.PlatformY, environment.PlatformZ,
+				1 * y + environment.PlatformY, -10,
 				0 * 4 * sin(1 * phi), 0 * 4 * cos(1 * phi), 0 * 5 * sin(phi));
 
 		/*
@@ -253,8 +253,119 @@ void moveCircle(double radius, double T_round, struct sEnvironment environment) 
 		delay_ms(ms_t - ms_oper);
 	}
 }
+void moveCircleZ(double radius, double T_round, struct sEnvironment environment) {
+	printf("Nakurwiam salto\n\r");
+	int step = 0;
 
-void moveCircle2(double radius, double T_round, double tx, double ty, double tz) {
+	double phi = 0.0; // dodac ew poczatkowe przewidzenie punktu koncowego i na jego podstawie wziac startowy
+	double x = 0.0;
+	double y = 0.0;
+	double z = 0.0;
+	int ms_t = 50; // ms 1 stepa
+	int ms_oper = 46; // 43 ms na operacje
+
+	// trzeba zadawac staly RPM
+	for (step; phi < 6.28; step++) {
+		phi += 6.283 * ms_t / (T_round * 1000);
+		x = radius * cos(1 * phi);
+		y = radius * sin(1 * phi);
+		z = 1* 4* sin(1 * phi);
+
+//		printf("\nstep %3d | kat=%3.2f[st]  x=%.1f  y=%.1f", step, phi * 57.3,
+//				x, y);
+
+		movePlatformFromTranslation_RPY(1 * x + environment.PlatformX,
+				1 * y + environment.PlatformY, 1*z -9  ,
+				5*sin(phi), 5*cos(phi), 0 );
+
+		delay_ms(ms_t - ms_oper);
+	}
+}
+
+void moveWave(double radius, double T_round, struct sEnvironment environment) {
+	printf("Nakurwiam salto\n\r");
+	int step = 0;
+
+	double phi = 0.0; // dodac ew poczatkowe przewidzenie punktu koncowego i na jego podstawie wziac startowy
+	double x = 0.0;
+	double y = 0.0;
+	double z = 0.0;
+	int ms_t = 50; // ms 1 stepa
+	int ms_oper = 46; // 43 ms na operacje
+
+	// trzeba zadawac staly RPM
+	for (step; phi < 6.28; step++) {
+		phi += 6.283 * ms_t / (T_round * 1000);
+		x = radius * cos(1 * phi);
+		y = radius * sin(1 * phi);
+		z = 1* 6* sin(1 * phi);
+
+//		printf("\nstep %3d | kat=%3.2f[st]  x=%.1f  y=%.1f", step, phi * 57.3,
+//				x, y);
+
+		movePlatformFromTranslation_RPY(0 * x + environment.PlatformX,
+				0 * y + environment.PlatformY, 1*z -9,
+				3*sin(3*phi), 3*sin(3*phi), 0*sin(phi) );
+
+		delay_ms(ms_t - ms_oper);
+	}
+}
+
+void moveZ(double radius, double T_round, struct sEnvironment environment) {
+	printf("Nakurwiam salto\n\r");
+	int step = 0;
+
+	double phi = 0.0; // dodac ew poczatkowe przewidzenie punktu koncowego i na jego podstawie wziac startowy
+	double z = 0.0;
+	int ms_t = 50; // ms 1 stepa
+	int ms_oper = 46; // 43 ms na operacje
+
+	// trzeba zadawac staly RPM
+	for (step; phi < 6.28; step++) {
+		phi += 6.283 * ms_t / (T_round * 1000);
+		z = radius / 2 * sin(1 * phi);
+
+//		printf("\nstep %3d | kat=%3.2f[st]  x=%.1f  y=%.1f", step, phi * 57.3,
+//				x, y);
+
+		movePlatformFromTranslation_RPY(0,
+				0, 1*z -10  ,
+				0 * 4 * sin(1 * phi), 0 * 4 * cos(1 * phi), 0 * 5 * sin(phi));
+		delay_ms(ms_t - ms_oper);
+	}
+}
+
+void moveY(double radius, double T_round, struct sEnvironment environment) {
+	printf("Nakurwiam salto\n\r");
+	int step = 0;
+
+	double phi = 0.0; // dodac ew poczatkowe przewidzenie punktu koncowego i na jego podstawie wziac startowy
+	double x = 0.0;
+	double y = 0.0;
+	double z = 0.0;
+	int ms_t = 50; // ms 1 stepa
+	int ms_oper = 46; // 43 ms na operacje
+
+	// trzeba zadawac staly RPM
+	for (step; phi < 6.28; step++) {
+		phi += 6.283 * ms_t / (T_round * 1000);
+		x = radius * cos(1 * phi);
+		y = radius * sin(1 * phi);
+		z = 0* sin(1 * phi);
+
+//		printf("\nstep %3d | kat=%3.2f[st]  x=%.1f  y=%.1f", step, phi * 57.3,
+//				x, y);
+
+		movePlatformFromTranslation_RPY(0 * x + environment.PlatformX,
+				0 * y + environment.PlatformY, 1*z -9  ,
+				0, 0, 1 * 14 * sin(phi));
+
+		delay_ms(ms_t - ms_oper);
+	}
+}
+
+
+void moveRP(double radius, double T_round) {
 	printf("\nNakurwiam salto");
 	int step = 0;
 
@@ -275,9 +386,9 @@ void moveCircle2(double radius, double T_round, double tx, double ty, double tz)
 		printf("\nstep %3d | kat=%3.2f[st]  x=%.1f  y=%.1f", step, phi * 57.3,
 				x, y);
 
-		movePlatformFromTranslation_RPY(1 * x + tx, 1 * y + ty,
-				-9 + 9 * sin(3 * phi), 0 * 4 * sin(1 * phi),
-				0 * 4 * cos(1 * phi), 0 * 5 * sin(phi));
+		movePlatformFromTranslation_RPY(0 , 0 ,
+				-9 + 0 * sin(3 * phi), radius * sin(1 * phi),
+				radius * cos(1 * phi), 0);
 		delay_ms(ms_t - ms_oper);
 	}
 }

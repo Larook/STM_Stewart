@@ -42,9 +42,9 @@ struct sEnvironment {
 	int16_t PlatformZ;
 
 	// IMU
-	int16_t Roll;
-	int16_t Pitch;
-	int16_t Yaw;
+	float Roll;
+	float Pitch;
+	float Yaw;
 
 	// touchpanel
 	uint16_t X_TouchPanel;

@@ -45,8 +45,8 @@ extern void lsm_write_reg(uint8_t reg, uint8_t value);
 extern uint8_t lsm_read_reg(uint8_t reg);
 extern int16_t lsm_read_value(uint8_t reg);
 
-int getRollIMU(); //cos jakby troche nietak
-int getPitchIMU(); //-8 do 8
-int getYawIMU(); //-5 do 5
+float getRollIMU(); //cos jakby troche nietak
+float getPitchIMU(); //-8 do 8
+float getYawIMU(); //-5 do 5
 
 #endif /* LSM303D_H_ */
