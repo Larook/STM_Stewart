@@ -266,11 +266,12 @@ void TIM2_IRQHandler() {
 //						ptr_env->PlatformZ, ptr_env->X_Real, ptr_env->Y_Real,
 //						ptr_env->next_angle_Roll, PIDx.e_in, ptr_env->next_angle_Pitch, PIDy.e_in);
 
-				printf(
-						"Z = %d   \t Xpanel_r = %f   \t Ypanel_r = %f   \t\t Roll = %f, error_r = %.0f   \t Pitch = %f, error_p = %.0f   \n\r",
-						ptr_env->PlatformZ, ptr_env->X_Real, ptr_env->Y_Real,
-						ptr_env->next_angle_Roll, PIDx.e_in,
-						ptr_env->next_angle_Pitch, PIDy.e_in);
+				printf("X: yp=%.3f \t yi=%.3f \t yd=%.5f \n\r",PIDx.yp, PIDx.yi, PIDx.yd);
+//				printf(
+//						"Z = %d   \t Xpanel_r = %f   \t Ypanel_r = %f   \t\t Roll = %f, error_r = %.0f   \t Pitch = %f, error_p = %.0f   \n\r",
+//						ptr_env->PlatformZ, ptr_env->X_Real, ptr_env->Y_Real,
+//						ptr_env->next_angle_Roll, PIDx.e_in,
+//						ptr_env->next_angle_Pitch, PIDy.e_in);
 			}
 
 			/* Jesli przycisk nie wcisniety - rob ruch na podstawie joysticka*/
