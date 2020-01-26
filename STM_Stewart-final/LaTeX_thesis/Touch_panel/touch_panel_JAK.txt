@@ -1,0 +1,42 @@
+/*
+	 * ZEBY ODCZYTAC PRAWIDLOWO WSP X I Y MUSZE ZMIENIC GPIO.MODE NA PINACH CZARNYM (PC1 os X) I BIALYM (PC2 os Y)
+	 * jak zmienic gpio mode? Poprzez zmiane deklaracji struktury
+	 * Dodac w takim razie druga strukture gpio_touch i skorzystac z pinow z channela ADC2 ktory by byl zmieniany programowo?
+	 *
+	 */
+
+
+// odczyt X na rejestrach Wcale nie wyglada jakby dzialal
+		
+
+GPIOx->CRL = tmpreg; // 0x44424202 
+		GPIO_StructInit(&gpio);
+		gpio.GPIO_Pin = GPIO_Pin_2;
+		gpio.GPIO_Mode = GPIO_Mode_Out_PP;
+		GPIO_Init(GPIOC, &gpio);
+
+GPIOx->BRR = GPIO_Pin; //0x4
+		GPIO_ResetBits(GPIOC, GPIO_Pin_2);  // white GND
+
+
+GPIOx->CRL = tmpreg; // 0x44424202
+		GPIO_StructInit(&gpio);
+		gpio.GPIO_Pin = GPIO_Pin_0;
+		gpio.GPIO_Mode = GPIO_Mode_Out_PP;
+		GPIO_Init(GPIOC, &gpio);
+
+GPIOx->BSRR = GPIO_Pin; // 0x1
+		GPIO_SetBits(GPIOC, GPIO_Pin_0); // blue Vcc
+
+
+GPIOx->CRL = tmpreg; // 0x44424202
+		GPIO_StructInit(&gpio);
+		gpio.GPIO_Pin = GPIO_Pin_3;
+		gpio.GPIO_Mode = GPIO_Mode_IN_FLOATING;
+		GPIO_Init(GPIOC, &gpio);  // red float
+
+
+GPIOx->CRL = tmpreg; // 0x44424202  // PC1 GPIO_Mode_AIN
+
+			
+
