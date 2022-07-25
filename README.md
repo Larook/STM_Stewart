@@ -10,16 +10,17 @@ Outcome:
 The structure works fine with all the movements possible, combined with gimbal-like stabilisation thanks to the used IMU.
 Unfortunately the inaccuracy of servos in the joints were pointed as the main obstacle preventing from succesfull ball balancing on the limited area of top plate.
 
-![build](https://github.com/Larook/STM_Stewart/blob/final/LaTeX_thesis/Thesis_images/Czesci_i_konstrukcja/Platforma_rzeczywista.JPG)
+<img src="https://github.com/Larook/STM_Stewart/blob/final/LaTeX_thesis/Thesis_images/Czesci_i_konstrukcja/Platforma_rzeczywista.JPG" width="700" height="700">
 
-Construction:
-![inv_kin](https://github.com/Larook/STM_Stewart/blob/final/LaTeX_thesis/Thesis_images/Kinematyka_odwrotna/noga_serwo_wymiary_1.png)
 
-![touch_panel](https://github.com/Larook/STM_Stewart/blob/final/LaTeX_thesis/Thesis_images/TouchPanel/HOW%20IT%20SHOULD%20WORK.jpg)
+State machine of operations:
+<img src="https://github.com/Larook/STM_Stewart/blob/final/LaTeX_thesis/Thesis_images/statemachine.png" width="700" height="700">
 
-State machine:
-![state_machine](https://github.com/Larook/STM_Stewart/blob/final/LaTeX_thesis/Thesis_images/statemachine.png)
+Simplified inverse kinematics model:
+<img src="https://github.com/Larook/STM_Stewart/blob/final/LaTeX_thesis/Thesis_images/Kinematyka_odwrotna/noga_serwo_wymiary_1.png" width="700" height="700">
 
+Reading the touch data:
+<img src="https://github.com/Larook/STM_Stewart/blob/final/LaTeX_thesis/Thesis_images/TouchPanel/HOW%20IT%20SHOULD%20WORK.jpg" width="700" height="700">
 
 PID response:
-![state_machine](https://github.com/Larook/STM_Stewart/blob/final/LaTeX_thesis/Thesis_images/step_response.png)
+<img src="https://github.com/Larook/STM_Stewart/blob/final/LaTeX_thesis/Thesis_images/step_response.png" width="700" height="700">
