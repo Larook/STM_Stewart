@@ -1,7 +1,7 @@
 # STM_Stewart
 Bachelor's thesis in the Warsaw University of Technology.
 
-![WUT logo](https://github.com/Larook/STM_Stewart/blob/final/LaTeX_thesis/Thesis_images/logopw.png)
+<img src="https://github.com/Larook/STM_Stewart/blob/final/LaTeX_thesis/Thesis_images/logopw.png" width="200" height="200">
 
 The project's goal was to develop a 6DOF parallel manipulator known as the Stewart platform.
 On top of the STM32 - based motion control an attempt to balance a metal ball on top of the platform's upper plate using the resistive touch sensor and PID controller.
