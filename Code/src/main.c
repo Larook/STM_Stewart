@@ -111,8 +111,10 @@ int main(void) {
 //	set_PID_params(&PIDx, 1100, -1100, 0.0000020, 1820, 0.000019); lepiej
 //	set_PID_params(&PIDx, 1100, -1100, 0.0000013, 0xde, 0.000020); jeszcze lepiej
 //	set_PID_params(&PIDx, 1100, -1100, 0.0000013, 0xaefe, 0.000018); //konstruktor do regulatora PID osi X D=0.0001
-	set_PID_params(&PIDx, 1100, -1100, 0.0000004, 0.00000000000001, 0.000019); //konstruktor do regulatora PID osi X D=0.0001 I = 0.000000000000000001
-	set_PID_params(&PIDy, 1100, -1100, 0.0000004, 0.00000000000001, 0.000019); //konstruktor do regulatora PID osi Y D=0.0001
+//	set_PID_params(&PIDx, 1100, -1100, 0.0075, 0.019, 0.015); //po zmianie na kod bez Ts
+//	set_PID_params(&PIDx, 1100, -1100, 0.0021, 0.036, 0.01); //po zmianie na kod bez Ts
+	set_PID_params(&PIDx, 1100, -1100, 0.0022, 0.047, 0.012); //po zmianie na kod bez Ts
+	set_PID_params(&PIDy, 1100, -1100, 0.0022, 0.047, 0.012); //po zmianie na kod bez Ts
 
 //	Niby ok, ale nadal jest spore opoznienie, spory lag - albo duzo szybciej przerwania, albo zmienic podejscie troche
 //	set_PID_params(&PIDx, 1100, -1100, 0.2, 1.8, 0.3); //konstruktor do regulatora PID osi X
@@ -244,31 +246,39 @@ void TIM2_IRQHandler() {
 
 				// 0.05s = 50ms = okres przerwan
 
-				//! TRZEBA POPRAWIC DRUGI - NA + !!!
 				ptr_env->next_angle_Pitch = -1
-						* get_angle_from_PID_output(&PIDx, 35, 0.05) * 57.3
-						; // osia X steruje Pitch   5.3   0,169721656 bylo 9.71 a potem 9.48
+						* get_angle_from_PID_output(&PIDx, 35, 0.05) * 57.3; // osia X steruje Pitch   5.3   0,169721656 bylo 9.71 a potem 9.48, a potem 35
 
-				ptr_env->next_angle_Roll = get_angle_from_PID_output(&PIDy,
-						35, 0.05) * 57.3 ; // osia Y steruje Roll 0.45   0,169721656
+				ptr_env->next_angle_Roll = get_angle_from_PID_output(&PIDy, 35,
+						0.05) * 57.3; // osia Y steruje Roll 0.45   0,169721656
 
 				//zrob ruch - najlepiej ze struktury, ktora sie updateuje w przerwaniach
 				movePlatformFromTranslation_RPY(0, 0, ptr_env->PlatformZ,
-						ptr_env->next_angle_Roll + ptr_env->roll_level_bias, ptr_env->next_angle_Pitch+ ptr_env->pitch_level_bias, 0);
+						ptr_env->next_angle_Roll + ptr_env->roll_level_bias,
+						ptr_env->next_angle_Pitch + ptr_env->pitch_level_bias,
+						0);
 
 				//			movePlatformFromTranslation_RPY(0, 0, ptr_env->PlatformZ, // levelowanie dobrego poziomu platformy
 				//					ptr_env->roll_level_bias, ptr_env->pitch_level_bias, 0);
-				printf(
-						"\nX = %d   \t Y = %d   \t Z = %d   \t Xpanel_r = %f   \t Ypanel_r = %f   \t\t Roll = %f   \t Pitch = %f  \n\r",
-						ptr_env->PlatformX, ptr_env->PlatformY,
-						ptr_env->PlatformZ, ptr_env->X_Real, ptr_env->Y_Real,
-						ptr_env->next_angle_Roll, ptr_env->next_angle_Pitch);
+//				printf(
+//						"\nX = %d   \t Y = %d   \t Z = %d   \t Xpanel_r = %f   \t Ypanel_r = %f   \t\t Roll = %f, error_r = %f   \t Pitch = %f, error_p = %f   \n\r",
+//						ptr_env->PlatformX, ptr_env->PlatformY,
+//						ptr_env->PlatformZ, ptr_env->X_Real, ptr_env->Y_Real,
+//						ptr_env->next_angle_Roll, PIDx.e_in, ptr_env->next_angle_Pitch, PIDy.e_in);
+
+				printf("X: yp=%.3f \t yi=%.3f \t yd=%.5f \n\r",PIDx.yp, PIDx.yi, PIDx.yd);
+//				printf(
+//						"Z = %d   \t Xpanel_r = %f   \t Ypanel_r = %f   \t\t Roll = %f, error_r = %.0f   \t Pitch = %f, error_p = %.0f   \n\r",
+//						ptr_env->PlatformZ, ptr_env->X_Real, ptr_env->Y_Real,
+//						ptr_env->next_angle_Roll, PIDx.e_in,
+//						ptr_env->next_angle_Pitch, PIDy.e_in);
 			}
 
 			/* Jesli przycisk nie wcisniety - rob ruch na podstawie joysticka*/
 			else {
 				movePlatformFromTranslation_RPY(ptr_env->PlatformX,
-						ptr_env->PlatformY, ptr_env->PlatformZ, ptr_env->Roll + ptr_env->roll_level_bias,
+						ptr_env->PlatformY, ptr_env->PlatformZ,
+						ptr_env->Roll + ptr_env->roll_level_bias,
 						ptr_env->Pitch + ptr_env->pitch_level_bias, 0);
 
 //				movePlatformFromTranslation_RPY(ptr_env->PlatformX,

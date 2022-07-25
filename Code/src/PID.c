@@ -34,11 +34,11 @@ float get_PID_output(sPID_controller *controller, int Ts) { // trzeba dobrac Ts 
 	} else { // normalnie oblicz yi_out (calkuj)
 
 //		 Z wpisaniem sampling Time
-//		controller->yi = controller->Ki * controller->x_in * Ts
-//				+ controller->yi_p; // I
+		controller->yi = controller->Ki * controller->e_in
+				+ controller->y_out_p; // I
 
-		controller->yi = controller->Ki * controller->e_in * Ts
-				+ controller->y_out_p; // I  bylo wczesniej yi_p
+//		controller->yi = controller->Ki * controller->e_in * Ts
+//				+ controller->y_out_p; // I  bylo wczesniej yi_p
 	}
 	/* Po obliczeniu I licz dalej wyjscie P i D */
 
@@ -58,11 +58,11 @@ float get_angle_from_PID_output(sPID_controller *controller,
 	// x.. = const * rad
 
 // z wrzuceniem sampling time
-	float angle_rad = (controller->y_out - 2 * controller->y_out_p
-			- controller->y_out_pp) / Ts / Ts / g_inertia_const;
-
 //	float angle_rad = (controller->y_out - 2 * controller->y_out_p
-//			- controller->y_out_pp) / g_inertia_const;
+//			+ controller->y_out_pp) / Ts / Ts / g_inertia_const;
+
+	float angle_rad = (controller->y_out - 2 * controller->y_out_p
+			+ controller->y_out_pp) / g_inertia_const;
 
 	return angle_rad;
 }
