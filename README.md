@@ -14,7 +14,7 @@ Unfortunately the inaccuracy of servos in the joints were pointed as the main ob
 
 
 - State machine of operations:
-- 
+
 <img src="https://github.com/Larook/STM_Stewart/blob/final/LaTeX_thesis/Thesis_images/statemachine.png" width="600" height="600">
 
 - Simplified inverse kinematics model:
@@ -23,8 +23,8 @@ Unfortunately the inaccuracy of servos in the joints were pointed as the main ob
 
 - Reading the touch data:
 
-<img src="https://github.com/Larook/STM_Stewart/blob/final/LaTeX_thesis/Thesis_images/TouchPanel/HOW%20IT%20SHOULD%20WORK.jpg" width="600" height="600">
+<img src="https://github.com/Larook/STM_Stewart/blob/final/LaTeX_thesis/Thesis_images/TouchPanel/HOW%20IT%20SHOULD%20WORK.jpg" width="600" height="550">
 
 - PID response:
 
-<img src="https://github.com/Larook/STM_Stewart/blob/final/LaTeX_thesis/Thesis_images/step_response.png" width="600" height="600">
+<img src="https://github.com/Larook/STM_Stewart/blob/final/LaTeX_thesis/Thesis_images/step_response.png" width="400" height="400">
